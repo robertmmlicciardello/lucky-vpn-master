@@ -1,4 +1,3 @@
-
 // API Endpoints for Android VPN App Integration
 // These endpoints should be implemented in your backend (Laravel/Node.js/etc.)
 
@@ -37,6 +36,18 @@ export const SERVER_ENDPOINTS = {
   SERVER_STATUS: `${API_BASE_URL}/servers/{id}/status`,
   CONNECT_SERVER: `${API_BASE_URL}/servers/{id}/connect`,
   DISCONNECT_SERVER: `${API_BASE_URL}/servers/{id}/disconnect`,
+};
+
+// OneConnect VPN Integration
+export const ONECONNECT_ENDPOINTS = {
+  CONFIGURE_API: `${API_BASE_URL}/admin/oneconnect/config`,
+  IMPORT_SERVERS: `${API_BASE_URL}/admin/oneconnect/import`,
+  SYNC_SERVERS: `${API_BASE_URL}/admin/oneconnect/sync`,
+  GET_ONECONNECT_SERVERS: `${API_BASE_URL}/servers/oneconnect`,
+  ONECONNECT_SERVER_STATUS: `${API_BASE_URL}/oneconnect/servers/{id}/status`,
+  ONECONNECT_CONNECT: `${API_BASE_URL}/oneconnect/servers/{id}/connect`,
+  ONECONNECT_DISCONNECT: `${API_BASE_URL}/oneconnect/servers/{id}/disconnect`,
+  GET_ONECONNECT_CONFIG: `${API_BASE_URL}/oneconnect/servers/{id}/config`,
 };
 
 // Subscription & Payments
@@ -121,12 +132,55 @@ export const apiService = {
   },
 
   // Get servers
-  async getServers(type?: 'free' | 'premium') {
-    const url = type === 'free' ? SERVER_ENDPOINTS.GET_FREE_SERVERS 
-                : type === 'premium' ? SERVER_ENDPOINTS.GET_PREMIUM_SERVERS 
-                : SERVER_ENDPOINTS.GET_SERVERS;
+  async getServers(type?: 'free' | 'premium' | 'oneconnect') {
+    let url = SERVER_ENDPOINTS.GET_SERVERS;
+    if (type === 'free') url = SERVER_ENDPOINTS.GET_FREE_SERVERS;
+    else if (type === 'premium') url = SERVER_ENDPOINTS.GET_PREMIUM_SERVERS;
+    else if (type === 'oneconnect') url = ONECONNECT_ENDPOINTS.GET_ONECONNECT_SERVERS;
     
     const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  // OneConnect VPN Integration
+  async configureOneConnect(apiKey: string, apiUrl: string, username: string, password: string) {
+    const response = await fetch(ONECONNECT_ENDPOINTS.CONFIGURE_API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: JSON.stringify({ api_key: apiKey, api_url: apiUrl, username, password }),
+    });
+    return response.json();
+  },
+
+  async importOneConnectServers() {
+    const response = await fetch(ONECONNECT_ENDPOINTS.IMPORT_SERVERS, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  async syncOneConnectServers() {
+    const response = await fetch(ONECONNECT_ENDPOINTS.SYNC_SERVERS, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  async getOneConnectConfig(serverId: string) {
+    const response = await fetch(ONECONNECT_ENDPOINTS.GET_ONECONNECT_CONFIG.replace('{id}', serverId), {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
       },
@@ -181,6 +235,22 @@ export interface Server {
   load: number;
   users: number;
   config_file?: string; // OVPN configuration
+  provider?: 'manual' | 'oneconnect';
+}
+
+export interface OneConnectServer extends Server {
+  provider: 'oneconnect';
+  oneconnect_id: string;
+  last_sync: string;
+}
+
+export interface OneConnectConfig {
+  api_key: string;
+  api_url: string;
+  username: string;
+  password?: string;
+  last_sync?: string;
+  status: 'connected' | 'disconnected' | 'error';
 }
 
 export interface User {
