@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,13 +7,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Edit, Trash2, Server, Globe, Zap, Download, Upload, RefreshCw } from "lucide-react";
+import { Plus, Edit, Trash2, Server, Globe, Zap, Download, Upload, RefreshCw, Settings } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import OneConnectSettings from "./OneConnectSettings";
 
 const ServerManagement = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("servers");
+  
   const [servers, setServers] = useState([
     {
       id: 1,
@@ -310,14 +311,18 @@ const ServerManagement = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="servers" className="flex items-center gap-2">
             <Server className="w-4 h-4" />
             Manual Servers
           </TabsTrigger>
           <TabsTrigger value="oneconnect" className="flex items-center gap-2">
             <Zap className="w-4 h-4" />
-            OneConnect VPN
+            OneConnect Servers
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="flex items-center gap-2">
+            <Settings className="w-4 h-4" />
+            OneConnect Settings
           </TabsTrigger>
         </TabsList>
 
@@ -443,88 +448,13 @@ const ServerManagement = () => {
         </TabsContent>
 
         <TabsContent value="oneconnect" className="space-y-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <h3 className="text-lg font-semibold">OneConnect VPN Integration</h3>
-              <p className="text-sm text-gray-600">Import and manage servers from OneConnect API</p>
-            </div>
-            <div className="flex space-x-2">
-              <Button variant="outline" onClick={refreshOneConnectServers}>
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Refresh
-              </Button>
-              <Dialog open={isOneConnectDialogOpen} onOpenChange={setIsOneConnectDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="flex items-center gap-2">
-                    <Upload className="w-4 h-4" />
-                    Import Servers
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>OneConnect API Settings</DialogTitle>
-                    <DialogDescription>
-                      Configure your OneConnect API credentials to import servers
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="apiUrl">API URL</Label>
-                      <Input
-                        id="apiUrl"
-                        value={oneConnectApi.apiUrl}
-                        onChange={(e) => setOneConnectApi({...oneConnectApi, apiUrl: e.target.value})}
-                        placeholder="https://api.oneconnect.com/v1"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="apiKey">API Key *</Label>
-                      <Input
-                        id="apiKey"
-                        type="password"
-                        value={oneConnectApi.apiKey}
-                        onChange={(e) => setOneConnectApi({...oneConnectApi, apiKey: e.target.value})}
-                        placeholder="Your OneConnect API Key"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="username">Username *</Label>
-                        <Input
-                          id="username"
-                          value={oneConnectApi.username}
-                          onChange={(e) => setOneConnectApi({...oneConnectApi, username: e.target.value})}
-                          placeholder="API Username"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                          id="password"
-                          type="password"
-                          value={oneConnectApi.password}
-                          onChange={(e) => setOneConnectApi({...oneConnectApi, password: e.target.value})}
-                          placeholder="API Password"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex justify-end space-x-2">
-                      <Button variant="outline" onClick={() => setIsOneConnectDialogOpen(false)}>
-                        Cancel
-                      </Button>
-                      <Button onClick={handleConnectOneConnect}>
-                        Connect & Import
-                      </Button>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
-
           <div className="grid gap-4">
             {oneConnectServers.map((server) => renderServerCard(server, true))}
           </div>
+        </TabsContent>
+
+        <TabsContent value="settings">
+          <OneConnectSettings />
         </TabsContent>
       </Tabs>
     </div>

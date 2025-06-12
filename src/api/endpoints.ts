@@ -40,14 +40,22 @@ export const SERVER_ENDPOINTS = {
 
 // OneConnect VPN Integration
 export const ONECONNECT_ENDPOINTS = {
-  CONFIGURE_API: `${API_BASE_URL}/admin/oneconnect/config`,
-  IMPORT_SERVERS: `${API_BASE_URL}/admin/oneconnect/import`,
+  // Configuration
+  SAVE_CONFIG: `${API_BASE_URL}/admin/oneconnect/config`,
+  GET_CONFIG: `${API_BASE_URL}/admin/oneconnect/config`,
+  TEST_CONNECTION: `${API_BASE_URL}/admin/oneconnect/test`,
+  
+  // Service Control
+  ENABLE_SERVICE: `${API_BASE_URL}/admin/oneconnect/enable`,
+  DISABLE_SERVICE: `${API_BASE_URL}/admin/oneconnect/disable`,
+  GET_SERVICE_STATUS: `${API_BASE_URL}/admin/oneconnect/status`,
+  
+  // Server Management
   SYNC_SERVERS: `${API_BASE_URL}/admin/oneconnect/sync`,
-  GET_ONECONNECT_SERVERS: `${API_BASE_URL}/servers/oneconnect`,
-  ONECONNECT_SERVER_STATUS: `${API_BASE_URL}/oneconnect/servers/{id}/status`,
-  ONECONNECT_CONNECT: `${API_BASE_URL}/oneconnect/servers/{id}/connect`,
-  ONECONNECT_DISCONNECT: `${API_BASE_URL}/oneconnect/servers/{id}/disconnect`,
-  GET_ONECONNECT_CONFIG: `${API_BASE_URL}/oneconnect/servers/{id}/config`,
+  GET_SERVERS: `${API_BASE_URL}/servers/oneconnect`,
+  GET_SERVER_CONFIG: `${API_BASE_URL}/oneconnect/servers/{id}/config`,
+  CONNECT_SERVER: `${API_BASE_URL}/oneconnect/servers/{id}/connect`,
+  DISCONNECT_SERVER: `${API_BASE_URL}/oneconnect/servers/{id}/disconnect`,
 };
 
 // Subscription & Payments
@@ -219,6 +227,93 @@ export const apiService = {
     });
     return response.json();
   },
+  // OneConnect Configuration
+  async saveOneConnectConfig(apiKey: string, apiUrl: string) {
+    const response = await fetch(ONECONNECT_ENDPOINTS.SAVE_CONFIG, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: JSON.stringify({ 
+        api_key: apiKey, 
+        api_url: apiUrl,
+        enabled: true 
+      }),
+    });
+    return response.json();
+  },
+
+  async getOneConnectConfig() {
+    const response = await fetch(ONECONNECT_ENDPOINTS.GET_CONFIG, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  async testOneConnectConnection(apiKey: string, apiUrl: string) {
+    const response = await fetch(ONECONNECT_ENDPOINTS.TEST_CONNECTION, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: JSON.stringify({ api_key: apiKey, api_url: apiUrl }),
+    });
+    return response.json();
+  },
+
+  // OneConnect Service Control
+  async enableOneConnectService() {
+    const response = await fetch(ONECONNECT_ENDPOINTS.ENABLE_SERVICE, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  async disableOneConnectService() {
+    const response = await fetch(ONECONNECT_ENDPOINTS.DISABLE_SERVICE, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  async getOneConnectServiceStatus() {
+    const response = await fetch(ONECONNECT_ENDPOINTS.GET_SERVICE_STATUS, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  // OneConnect Server Management
+  async syncOneConnectServers() {
+    const response = await fetch(ONECONNECT_ENDPOINTS.SYNC_SERVERS, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  async getOneConnectServers() {
+    const response = await fetch(ONECONNECT_ENDPOINTS.GET_SERVERS, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
 };
 
 // Sample API Response Types (for TypeScript)
@@ -301,4 +396,24 @@ export interface AppConfig {
     auto_connect: boolean;
     kill_switch: boolean;
   };
+}
+
+// Add new interface for OneConnect configuration
+export interface OneConnectConfiguration {
+  id?: number;
+  api_key: string;
+  api_url: string;
+  enabled: boolean;
+  is_connected: boolean;
+  last_sync?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface OneConnectServiceStatus {
+  enabled: boolean;
+  connected: boolean;
+  server_count: number;
+  last_sync: string | null;
+  api_status: 'active' | 'inactive' | 'error';
 }
