@@ -385,6 +385,7 @@ export interface AdNetworkConfig {
   interstitial_id?: string;
   rewarded_id?: string;
   native_id?: string;
+  app_open_id?: string; // Added App Open Ad support
   api_key?: string;
   placement_id?: string;
 }
@@ -399,6 +400,14 @@ export interface AdNetworkConfiguration {
   primary_rewarded_network: AdNetworkType;
   primary_interstitial_network: AdNetworkType;
   primary_banner_network: AdNetworkType;
+  primary_app_open_network: AdNetworkType; // Added App Open primary network
+  
+  // Feature-specific ad network controls
+  lucky_wheel_network: AdNetworkType;
+  tic_tac_toe_network: AdNetworkType;
+  scratch_card_network: AdNetworkType;
+  premium_server_unlock_network: AdNetworkType;
+  
   ad_frequency: number;
   reward_points: number;
 }

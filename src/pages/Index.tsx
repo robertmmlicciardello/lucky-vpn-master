@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,7 +11,8 @@ import {
   Gift,
   BarChart3,
   Shield,
-  MonitorPlay
+  MonitorPlay,
+  Sparkles
 } from "lucide-react";
 import { useState } from "react";
 import ServerManagement from "@/components/admin/ServerManagement";
@@ -25,83 +27,131 @@ import DashboardStats from "@/components/admin/DashboardStats";
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
 
+  const navigationItems = [
+    { value: "dashboard", label: "Dashboard", icon: BarChart3, color: "text-blue-600", bgColor: "bg-blue-50" },
+    { value: "servers", label: "Servers", icon: Server, color: "text-green-600", bgColor: "bg-green-50" },
+    { value: "users", label: "Users", icon: Users, color: "text-purple-600", bgColor: "bg-purple-50" },
+    { value: "ads", label: "Ads", icon: MonitorPlay, color: "text-orange-600", bgColor: "bg-orange-50" },
+    { value: "multi-ads", label: "Multi Ads", icon: Shield, color: "text-red-600", bgColor: "bg-red-50" },
+    { value: "plans", label: "Plans", icon: DollarSign, color: "text-yellow-600", bgColor: "bg-yellow-50" },
+    { value: "rewards", label: "Rewards", icon: Gift, color: "text-pink-600", bgColor: "bg-pink-50" },
+    { value: "settings", label: "Settings", icon: Settings, color: "text-gray-600", bgColor: "bg-gray-50" }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 lg:p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">VPN Admin Panel</h1>
-          <p className="text-gray-600">Manage your VPN application and users</p>
+        {/* Modern Header */}
+        <div className="mb-8 lg:mb-12">
+          <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-6 lg:p-8 shadow-2xl border border-white/20">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <Sparkles className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                  VPN Admin Panel
+                </h1>
+                <p className="text-gray-600 text-lg lg:text-xl mt-2">
+                  Advanced management system for your VPN application
+                </p>
+              </div>
+            </div>
+            
+            {/* Quick Stats */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-xl border border-blue-200">
+                <div className="text-2xl font-bold text-blue-600">1,247</div>
+                <div className="text-sm text-blue-600/70">Active Users</div>
+              </div>
+              <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-xl border border-green-200">
+                <div className="text-2xl font-bold text-green-600">24</div>
+                <div className="text-sm text-green-600/70">Servers Online</div>
+              </div>
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-xl border border-purple-200">
+                <div className="text-2xl font-bold text-purple-600">$2,456</div>
+                <div className="text-sm text-purple-600/70">Monthly Revenue</div>
+              </div>
+              <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-xl border border-orange-200">
+                <div className="text-2xl font-bold text-orange-600">98.5%</div>
+                <div className="text-sm text-orange-600/70">Uptime</div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8 lg:w-auto lg:inline-grid">
-            <TabsTrigger value="dashboard" className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4" />
-              Dashboard
-            </TabsTrigger>
-            <TabsTrigger value="servers" className="flex items-center gap-2">
-              <Server className="w-4 h-4" />
-              Servers
-            </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              Users
-            </TabsTrigger>
-            <TabsTrigger value="ads" className="flex items-center gap-2">
-              <MonitorPlay className="w-4 h-4" />
-              Ads
-            </TabsTrigger>
-            <TabsTrigger value="multi-ads" className="flex items-center gap-2">
-              <Shield className="w-4 h-4" />
-              Multi Ads
-            </TabsTrigger>
-            <TabsTrigger value="plans" className="flex items-center gap-2">
-              <DollarSign className="w-4 h-4" />
-              Plans
-            </TabsTrigger>
-            <TabsTrigger value="rewards" className="flex items-center gap-2">
-              <Gift className="w-4 h-4" />
-              Rewards
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center gap-2">
-              <Settings className="w-4 h-4" />
-              Settings
-            </TabsTrigger>
-          </TabsList>
+        {/* Modern Navigation Tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+          <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-2 shadow-xl border border-white/20">
+            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 gap-2 bg-transparent">
+              {navigationItems.map((item) => {
+                const IconComponent = item.icon;
+                return (
+                  <TabsTrigger 
+                    key={item.value}
+                    value={item.value} 
+                    className="flex flex-col items-center gap-2 p-3 lg:p-4 rounded-xl transition-all duration-200 data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:scale-105"
+                  >
+                    <div className={`w-8 h-8 lg:w-10 lg:h-10 ${item.bgColor} rounded-lg flex items-center justify-center shadow-sm`}>
+                      <IconComponent className={`w-4 h-4 lg:w-5 lg:h-5 ${item.color}`} />
+                    </div>
+                    <span className="text-xs lg:text-sm font-medium hidden lg:block">
+                      {item.label}
+                    </span>
+                  </TabsTrigger>
+                );
+              })}
+            </TabsList>
+          </div>
 
-          <TabsContent value="dashboard">
-            <DashboardStats />
-          </TabsContent>
+          {/* Tab Contents with modern styling */}
+          <div className="bg-white/30 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+            <TabsContent value="dashboard" className="m-0">
+              <div className="p-6 lg:p-8">
+                <DashboardStats />
+              </div>
+            </TabsContent>
 
-          <TabsContent value="servers">
-            <ServerManagement />
-          </TabsContent>
+            <TabsContent value="servers" className="m-0">
+              <div className="p-6 lg:p-8">
+                <ServerManagement />
+              </div>
+            </TabsContent>
 
-          <TabsContent value="users">
-            <UserManagement />
-          </TabsContent>
+            <TabsContent value="users" className="m-0">
+              <div className="p-6 lg:p-8">
+                <UserManagement />
+              </div>
+            </TabsContent>
 
-          <TabsContent value="ads">
-            <AdManagement />
-          </TabsContent>
+            <TabsContent value="ads" className="m-0">
+              <div className="p-6 lg:p-8">
+                <AdManagement />
+              </div>
+            </TabsContent>
 
-          <TabsContent value="multi-ads">
-            <MultiAdNetworkManager />
-          </TabsContent>
+            <TabsContent value="multi-ads" className="m-0">
+              <MultiAdNetworkManager />
+            </TabsContent>
 
-          <TabsContent value="plans">
-            <SubscriptionPlans />
-          </TabsContent>
+            <TabsContent value="plans" className="m-0">
+              <div className="p-6 lg:p-8">
+                <SubscriptionPlans />
+              </div>
+            </TabsContent>
 
-          <TabsContent value="rewards">
-            <RewardsSystem />
-          </TabsContent>
+            <TabsContent value="rewards" className="m-0">
+              <div className="p-6 lg:p-8">
+                <RewardsSystem />
+              </div>
+            </TabsContent>
 
-          <TabsContent value="settings">
-            <AppSettings />
-          </TabsContent>
+            <TabsContent value="settings" className="m-0">
+              <div className="p-6 lg:p-8">
+                <AppSettings />
+              </div>
+            </TabsContent>
+          </div>
         </Tabs>
       </div>
     </div>
