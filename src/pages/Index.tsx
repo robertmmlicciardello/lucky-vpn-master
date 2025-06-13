@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,6 +22,10 @@ import SubscriptionPlans from "@/components/admin/SubscriptionPlans";
 import RewardsSystem from "@/components/admin/RewardsSystem";
 import AppSettings from "@/components/admin/AppSettings";
 import DashboardStats from "@/components/admin/DashboardStats";
+import NotificationManagement from "@/components/admin/NotificationManagement";
+import SupportSystem from "@/components/admin/SupportSystem";
+import BlogManagement from "@/components/admin/BlogManagement";
+import Leaderboard from "@/components/admin/Leaderboard";
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -35,6 +38,10 @@ const Index = () => {
     { value: "multi-ads", label: "Multi Ads", icon: Shield, color: "text-red-600", bgColor: "bg-red-50" },
     { value: "plans", label: "Plans", icon: DollarSign, color: "text-yellow-600", bgColor: "bg-yellow-50" },
     { value: "rewards", label: "Rewards", icon: Gift, color: "text-pink-600", bgColor: "bg-pink-50" },
+    { value: "notifications", label: "Notifications", icon: Smartphone, color: "text-indigo-600", bgColor: "bg-indigo-50" },
+    { value: "support", label: "Support", icon: Settings, color: "text-cyan-600", bgColor: "bg-cyan-50" },
+    { value: "blog", label: "Blog", icon: Settings, color: "text-teal-600", bgColor: "bg-teal-50" },
+    { value: "leaderboard", label: "Leaderboard", icon: Settings, color: "text-violet-600", bgColor: "bg-violet-50" },
     { value: "settings", label: "Settings", icon: Settings, color: "text-gray-600", bgColor: "bg-gray-50" }
   ];
 
@@ -83,7 +90,7 @@ const Index = () => {
         {/* Modern Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
           <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-2 shadow-xl border border-white/20">
-            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 gap-2 bg-transparent">
+            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-6 gap-2 bg-transparent">
               {navigationItems.map((item) => {
                 const IconComponent = item.icon;
                 return (
@@ -143,6 +150,30 @@ const Index = () => {
             <TabsContent value="rewards" className="m-0">
               <div className="p-6 lg:p-8">
                 <RewardsSystem />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="notifications" className="m-0">
+              <div className="p-6 lg:p-8">
+                <NotificationManagement />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="support" className="m-0">
+              <div className="p-6 lg:p-8">
+                <SupportSystem />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="blog" className="m-0">
+              <div className="p-6 lg:p-8">
+                <BlogManagement />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="leaderboard" className="m-0">
+              <div className="p-6 lg:p-8">
+                <Leaderboard />
               </div>
             </TabsContent>
 

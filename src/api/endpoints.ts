@@ -1,4 +1,3 @@
-
 // API Endpoints for Android VPN App Integration
 // These endpoints should be implemented in your backend (Laravel/Node.js/etc.)
 
@@ -128,6 +127,41 @@ export const SUPPORT_ENDPOINTS = {
   GET_FAQ: `${API_BASE_URL}/support/faq`,
   CREATE_TICKET: `${API_BASE_URL}/support/ticket`,
   GET_TICKETS: `${API_BASE_URL}/support/tickets`,
+};
+
+// Notification System Endpoints
+export const NOTIFICATION_ENDPOINTS = {
+  SEND_BROADCAST: `${API_BASE_URL}/admin/notifications/broadcast`,
+  SEND_INDIVIDUAL: `${API_BASE_URL}/admin/notifications/individual`,
+  GET_NOTIFICATION_HISTORY: `${API_BASE_URL}/admin/notifications/history`,
+  GET_USER_NOTIFICATIONS: `${API_BASE_URL}/notifications`,
+  MARK_AS_READ: `${API_BASE_URL}/notifications/{id}/read`,
+  GET_UNREAD_COUNT: `${API_BASE_URL}/notifications/unread-count`,
+};
+
+// Support System Endpoints
+export const BLOG_ENDPOINTS = {
+  GET_POSTS: `${API_BASE_URL}/blog/posts`,
+  GET_POST: `${API_BASE_URL}/blog/posts/{id}`,
+  CREATE_POST: `${API_BASE_URL}/admin/blog/posts`,
+  UPDATE_POST: `${API_BASE_URL}/admin/blog/posts/{id}`,
+  DELETE_POST: `${API_BASE_URL}/admin/blog/posts/{id}`,
+  PUBLISH_POST: `${API_BASE_URL}/admin/blog/posts/{id}/publish`,
+  GET_CATEGORIES: `${API_BASE_URL}/blog/categories`,
+  SEARCH_POSTS: `${API_BASE_URL}/blog/posts/search`,
+  INCREMENT_VIEWS: `${API_BASE_URL}/blog/posts/{id}/view`,
+};
+
+// Leaderboard Endpoints
+export const LEADERBOARD_ENDPOINTS = {
+  GET_LEADERBOARD: `${API_BASE_URL}/leaderboard`,
+  GET_USER_RANK: `${API_BASE_URL}/leaderboard/user/{id}`,
+  GET_TOP_USERS: `${API_BASE_URL}/leaderboard/top/{limit}`,
+  GET_LEADERBOARD_BY_PERIOD: `${API_BASE_URL}/leaderboard/{period}`, // daily, weekly, monthly, all-time
+  GET_ACHIEVEMENTS: `${API_BASE_URL}/achievements`,
+  GET_USER_ACHIEVEMENTS: `${API_BASE_URL}/achievements/user/{id}`,
+  REWARD_TOP_USERS: `${API_BASE_URL}/admin/leaderboard/reward-top`,
+  RESET_LEADERBOARD: `${API_BASE_URL}/admin/leaderboard/reset`,
 };
 
 // Example API Request Functions
@@ -309,6 +343,227 @@ export const apiService = {
     });
     return response.json();
   },
+
+  // Notification API calls
+  async sendBroadcastNotification(title: string, message: string) {
+    const response = await fetch(NOTIFICATION_ENDPOINTS.SEND_BROADCAST, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: JSON.stringify({ title, message }),
+    });
+    return response.json();
+  },
+
+  async sendIndividualNotification(title: string, message: string, userEmail: string) {
+    const response = await fetch(NOTIFICATION_ENDPOINTS.SEND_INDIVIDUAL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: JSON.stringify({ title, message, user_email: userEmail }),
+    });
+    return response.json();
+  },
+
+  async getNotificationHistory() {
+    const response = await fetch(NOTIFICATION_ENDPOINTS.GET_NOTIFICATION_HISTORY, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  async getUserNotifications() {
+    const response = await fetch(NOTIFICATION_ENDPOINTS.GET_USER_NOTIFICATIONS, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  async markNotificationAsRead(notificationId: string) {
+    const response = await fetch(NOTIFICATION_ENDPOINTS.MARK_AS_READ.replace('{id}', notificationId), {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  // Support API calls
+  async createSupportTicket(subject: string, message: string, priority: string = 'medium') {
+    const response = await fetch(SUPPORT_ENDPOINTS.CREATE_TICKET, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: JSON.stringify({ subject, message, priority }),
+    });
+    return response.json();
+  },
+
+  async getAllSupportTickets() {
+    const response = await fetch(SUPPORT_ENDPOINTS.GET_ALL_TICKETS, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  async updateTicketStatus(ticketId: string, status: string) {
+    const response = await fetch(SUPPORT_ENDPOINTS.UPDATE_TICKET_STATUS.replace('{id}', ticketId), {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: JSON.stringify({ status }),
+    });
+    return response.json();
+  },
+
+  async replyToTicket(ticketId: string, message: string) {
+    const response = await fetch(SUPPORT_ENDPOINTS.REPLY_TO_TICKET.replace('{id}', ticketId), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: JSON.stringify({ message }),
+    });
+    return response.json();
+  },
+
+  // Blog API calls
+  async getBlogPosts(page: number = 1, limit: number = 10) {
+    const response = await fetch(`${BLOG_ENDPOINTS.GET_POSTS}?page=${page}&limit=${limit}`);
+    return response.json();
+  },
+
+  async getBlogPost(postId: string) {
+    const response = await fetch(BLOG_ENDPOINTS.GET_POST.replace('{id}', postId));
+    return response.json();
+  },
+
+  async createBlogPost(postData: BlogPostData) {
+    const response = await fetch(BLOG_ENDPOINTS.CREATE_POST, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: JSON.stringify(postData),
+    });
+    return response.json();
+  },
+
+  async updateBlogPost(postId: string, postData: BlogPostData) {
+    const response = await fetch(BLOG_ENDPOINTS.UPDATE_POST.replace('{id}', postId), {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: JSON.stringify(postData),
+    });
+    return response.json();
+  },
+
+  async deleteBlogPost(postId: string) {
+    const response = await fetch(BLOG_ENDPOINTS.DELETE_POST.replace('{id}', postId), {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  async incrementPostViews(postId: string) {
+    const response = await fetch(BLOG_ENDPOINTS.INCREMENT_VIEWS.replace('{id}', postId), {
+      method: 'POST',
+    });
+    return response.json();
+  },
+
+  // Leaderboard API calls
+  async getLeaderboard(period: string = 'all-time', category: string = 'points') {
+    const response = await fetch(`${LEADERBOARD_ENDPOINTS.GET_LEADERBOARD}?period=${period}&category=${category}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  async getUserRank(userId: string) {
+    const response = await fetch(LEADERBOARD_ENDPOINTS.GET_USER_RANK.replace('{id}', userId),  {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  async getTopUsers(limit: number = 10) {
+    const response = await fetch(LEADERBOARD_ENDPOINTS.GET_TOP_USERS.replace('{limit}', limit.toString()), {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  async getAchievements() {
+    const response = await fetch(LEADERBOARD_ENDPOINTS.GET_ACHIEVEMENTS, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  async getUserAchievements(userId: string) {
+    const response = await fetch(LEADERBOARD_ENDPOINTS.GET_USER_ACHIEVEMENTS.replace('{id}', userId), {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  async rewardTopUsers(limit: number = 10, points: number = 1000) {
+    const response = await fetch(LEADERBOARD_ENDPOINTS.REWARD_TOP_USERS, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: JSON.stringify({ limit, points }),
+    });
+    return response.json();
+  },
+
+  async resetLeaderboard(period: string) {
+    const response = await fetch(LEADERBOARD_ENDPOINTS.RESET_LEADERBOARD, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: JSON.stringify({ period }),
+    });
+    return response.json();
+  },
 };
 
 // Sample API Response Types (for TypeScript)
@@ -454,3 +709,40 @@ export interface AdStatistics {
   ecpm: number;
 }
 
+// Add new interface types for the new features
+export interface NotificationData {
+  title: string;
+  message: string;
+  type: 'broadcast' | 'individual';
+  recipient?: string;
+}
+
+export interface SupportTicketData {
+  subject: string;
+  message: string;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+}
+
+export interface BlogPostData {
+  title: string;
+  content: string;
+  excerpt: string;
+  category: string;
+  tags: string[];
+  status: 'draft' | 'published' | 'archived';
+}
+
+export interface LeaderboardData {
+  period: 'daily' | 'weekly' | 'monthly' | 'all-time';
+  category: 'points' | 'referrals' | 'activity';
+  limit?: number;
+}
+
+export interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: 'points' | 'referrals' | 'activity' | 'premium';
+  pointsRequired?: number;
+}
