@@ -1,3 +1,4 @@
+
 // API Endpoints for Android VPN App Integration
 // These endpoints should be implemented in your backend (Laravel/Node.js/etc.)
 
@@ -91,12 +92,16 @@ export const GAME_ENDPOINTS = {
   GAME_HISTORY: `${API_BASE_URL}/games/history`,
 };
 
-// Ad Management
+// Enhanced Ad Management with Multiple Networks
 export const AD_ENDPOINTS = {
   GET_AD_CONFIG: `${API_BASE_URL}/ads/config`,
+  SAVE_AD_CONFIG: `${API_BASE_URL}/admin/ads/config`,
   RECORD_AD_VIEW: `${API_BASE_URL}/ads/view`,
   RECORD_AD_CLICK: `${API_BASE_URL}/ads/click`,
   GET_REWARDED_AD: `${API_BASE_URL}/ads/rewarded`,
+  GET_AD_NETWORKS: `${API_BASE_URL}/admin/ads/networks`,
+  UPDATE_AD_NETWORK: `${API_BASE_URL}/admin/ads/networks/{network}`,
+  GET_AD_STATISTICS: `${API_BASE_URL}/admin/ads/statistics`,
 };
 
 // App Settings
@@ -144,7 +149,7 @@ export const apiService = {
     let url = SERVER_ENDPOINTS.GET_SERVERS;
     if (type === 'free') url = SERVER_ENDPOINTS.GET_FREE_SERVERS;
     else if (type === 'premium') url = SERVER_ENDPOINTS.GET_PREMIUM_SERVERS;
-    else if (type === 'oneconnect') url = ONECONNECT_ENDPOINTS.GET_ONECONNECT_SERVERS;
+    else if (type === 'oneconnect') url = ONECONNECT_ENDPOINTS.GET_SERVERS;
     
     const response = await fetch(url, {
       headers: {
@@ -154,79 +159,6 @@ export const apiService = {
     return response.json();
   },
 
-  // OneConnect VPN Integration
-  async configureOneConnect(apiKey: string, apiUrl: string, username: string, password: string) {
-    const response = await fetch(ONECONNECT_ENDPOINTS.CONFIGURE_API, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-      },
-      body: JSON.stringify({ api_key: apiKey, api_url: apiUrl, username, password }),
-    });
-    return response.json();
-  },
-
-  async importOneConnectServers() {
-    const response = await fetch(ONECONNECT_ENDPOINTS.IMPORT_SERVERS, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-      },
-    });
-    return response.json();
-  },
-
-  async syncOneConnectServers() {
-    const response = await fetch(ONECONNECT_ENDPOINTS.SYNC_SERVERS, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-      },
-    });
-    return response.json();
-  },
-
-  async getOneConnectConfig(serverId: string) {
-    const response = await fetch(ONECONNECT_ENDPOINTS.GET_ONECONNECT_CONFIG.replace('{id}', serverId), {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-      },
-    });
-    return response.json();
-  },
-
-  // Add points
-  async addPoints(userId: string, points: number, reason: string) {
-    const response = await fetch(REWARDS_ENDPOINTS.ADD_POINTS, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-      },
-      body: JSON.stringify({ user_id: userId, points, reason }),
-    });
-    return response.json();
-  },
-
-  // Get app configuration
-  async getAppConfig() {
-    const response = await fetch(SETTINGS_ENDPOINTS.GET_APP_CONFIG);
-    return response.json();
-  },
-
-  // Record ad view
-  async recordAdView(adType: string, adId: string) {
-    const response = await fetch(AD_ENDPOINTS.RECORD_AD_VIEW, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-      },
-      body: JSON.stringify({ ad_type: adType, ad_id: adId }),
-    });
-    return response.json();
-  },
   // OneConnect Configuration
   async saveOneConnectConfig(apiKey: string, apiUrl: string) {
     const response = await fetch(ONECONNECT_ENDPOINTS.SAVE_CONFIG, {
@@ -314,6 +246,69 @@ export const apiService = {
     });
     return response.json();
   },
+
+  // Ad Management API calls
+  async saveAdConfig(config: AdNetworkConfiguration) {
+    const response = await fetch(AD_ENDPOINTS.SAVE_AD_CONFIG, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: JSON.stringify(config),
+    });
+    return response.json();
+  },
+
+  async getAdConfig() {
+    const response = await fetch(AD_ENDPOINTS.GET_AD_CONFIG, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  async getAdStatistics() {
+    const response = await fetch(AD_ENDPOINTS.GET_AD_STATISTICS, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+    return response.json();
+  },
+
+  // Add points
+  async addPoints(userId: string, points: number, reason: string) {
+    const response = await fetch(REWARDS_ENDPOINTS.ADD_POINTS, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: JSON.stringify({ user_id: userId, points, reason }),
+    });
+    return response.json();
+  },
+
+  // Get app configuration
+  async getAppConfig() {
+    const response = await fetch(SETTINGS_ENDPOINTS.GET_APP_CONFIG);
+    return response.json();
+  },
+
+  // Record ad view
+  async recordAdView(adType: string, adId: string, network: string) {
+    const response = await fetch(AD_ENDPOINTS.RECORD_AD_VIEW, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+      },
+      body: JSON.stringify({ ad_type: adType, ad_id: adId, network }),
+    });
+    return response.json();
+  },
 };
 
 // Sample API Response Types (for TypeScript)
@@ -329,7 +324,7 @@ export interface Server {
   status: 'online' | 'offline' | 'maintenance';
   load: number;
   users: number;
-  config_file?: string; // OVPN configuration
+  config_file?: string;
   provider?: 'manual' | 'oneconnect';
 }
 
@@ -380,17 +375,40 @@ export interface SubscriptionPlan {
   active: boolean;
 }
 
+// Enhanced Ad Network Configuration Types
+export type AdNetworkType = 'admob' | 'facebook' | 'applovin' | 'unity' | 'adcolony' | 'startapp';
+
+export interface AdNetworkConfig {
+  enabled: boolean;
+  app_id?: string;
+  banner_id?: string;
+  interstitial_id?: string;
+  rewarded_id?: string;
+  native_id?: string;
+  api_key?: string;
+  placement_id?: string;
+}
+
+export interface AdNetworkConfiguration {
+  admob: AdNetworkConfig;
+  facebook: AdNetworkConfig;
+  applovin: AdNetworkConfig;
+  unity: AdNetworkConfig;
+  adcolony: AdNetworkConfig;
+  startapp: AdNetworkConfig;
+  primary_rewarded_network: AdNetworkType;
+  primary_interstitial_network: AdNetworkType;
+  primary_banner_network: AdNetworkType;
+  ad_frequency: number;
+  reward_points: number;
+}
+
 export interface AppConfig {
   app_name: string;
   app_version: string;
   force_update: boolean;
   maintenance_mode: boolean;
-  ad_config: {
-    admob_enabled: boolean;
-    banner_ad_id: string;
-    interstitial_ad_id: string;
-    rewarded_ad_id: string;
-  };
+  ad_config: AdNetworkConfiguration;
   features: {
     free_server_limit: number;
     auto_connect: boolean;
@@ -417,3 +435,13 @@ export interface OneConnectServiceStatus {
   last_sync: string | null;
   api_status: 'active' | 'inactive' | 'error';
 }
+
+export interface AdStatistics {
+  network: AdNetworkType;
+  impressions: number;
+  clicks: number;
+  revenue: number;
+  fill_rate: number;
+  ecpm: number;
+}
+

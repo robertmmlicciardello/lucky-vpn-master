@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,6 +16,7 @@ import { useState } from "react";
 import ServerManagement from "@/components/admin/ServerManagement";
 import UserManagement from "@/components/admin/UserManagement";
 import AdManagement from "@/components/admin/AdManagement";
+import MultiAdNetworkManager from "@/components/admin/MultiAdNetworkManager";
 import SubscriptionPlans from "@/components/admin/SubscriptionPlans";
 import RewardsSystem from "@/components/admin/RewardsSystem";
 import AppSettings from "@/components/admin/AppSettings";
@@ -36,7 +36,7 @@ const Index = () => {
 
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:inline-grid">
+          <TabsList className="grid w-full grid-cols-8 lg:w-auto lg:inline-grid">
             <TabsTrigger value="dashboard" className="flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
               Dashboard
@@ -52,6 +52,10 @@ const Index = () => {
             <TabsTrigger value="ads" className="flex items-center gap-2">
               <MonitorPlay className="w-4 h-4" />
               Ads
+            </TabsTrigger>
+            <TabsTrigger value="multi-ads" className="flex items-center gap-2">
+              <Shield className="w-4 h-4" />
+              Multi Ads
             </TabsTrigger>
             <TabsTrigger value="plans" className="flex items-center gap-2">
               <DollarSign className="w-4 h-4" />
@@ -81,6 +85,10 @@ const Index = () => {
 
           <TabsContent value="ads">
             <AdManagement />
+          </TabsContent>
+
+          <TabsContent value="multi-ads">
+            <MultiAdNetworkManager />
           </TabsContent>
 
           <TabsContent value="plans">
