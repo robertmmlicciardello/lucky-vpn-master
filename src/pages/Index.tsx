@@ -87,22 +87,50 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Modern Navigation Tabs */}
+        {/* Modern Navigation Tabs - Improved Responsive Layout */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
           <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-2 shadow-xl border border-white/20">
-            <TabsList className="grid w-full grid-cols-4 lg:grid-cols-6 gap-2 bg-transparent">
+            {/* Mobile Navigation - Horizontal Scrollable */}
+            <div className="block lg:hidden">
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                {navigationItems.map((item) => {
+                  const IconComponent = item.icon;
+                  return (
+                    <button
+                      key={item.value}
+                      onClick={() => setActiveTab(item.value)}
+                      className={`flex flex-col items-center gap-2 p-3 min-w-[80px] rounded-xl transition-all duration-200 whitespace-nowrap ${
+                        activeTab === item.value 
+                          ? 'bg-white shadow-lg scale-105 border-2 border-blue-200' 
+                          : 'hover:bg-white/50'
+                      }`}
+                    >
+                      <div className={`w-8 h-8 ${item.bgColor} rounded-lg flex items-center justify-center shadow-sm`}>
+                        <IconComponent className={`w-4 h-4 ${item.color}`} />
+                      </div>
+                      <span className="text-xs font-medium">
+                        {item.label}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Desktop Navigation - Grid Layout */}
+            <TabsList className="hidden lg:grid w-full grid-cols-6 gap-2 bg-transparent">
               {navigationItems.map((item) => {
                 const IconComponent = item.icon;
                 return (
                   <TabsTrigger 
                     key={item.value}
                     value={item.value} 
-                    className="flex flex-col items-center gap-2 p-3 lg:p-4 rounded-xl transition-all duration-200 data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:scale-105"
+                    className="flex flex-col items-center gap-2 p-4 rounded-xl transition-all duration-200 data-[state=active]:bg-white data-[state=active]:shadow-lg data-[state=active]:scale-105"
                   >
-                    <div className={`w-8 h-8 lg:w-10 lg:h-10 ${item.bgColor} rounded-lg flex items-center justify-center shadow-sm`}>
-                      <IconComponent className={`w-4 h-4 lg:w-5 lg:h-5 ${item.color}`} />
+                    <div className={`w-10 h-10 ${item.bgColor} rounded-lg flex items-center justify-center shadow-sm`}>
+                      <IconComponent className={`w-5 h-5 ${item.color}`} />
                     </div>
-                    <span className="text-xs lg:text-sm font-medium hidden lg:block">
+                    <span className="text-sm font-medium">
                       {item.label}
                     </span>
                   </TabsTrigger>

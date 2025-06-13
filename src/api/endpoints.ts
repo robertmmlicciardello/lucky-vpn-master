@@ -127,6 +127,9 @@ export const SUPPORT_ENDPOINTS = {
   GET_FAQ: `${API_BASE_URL}/support/faq`,
   CREATE_TICKET: `${API_BASE_URL}/support/ticket`,
   GET_TICKETS: `${API_BASE_URL}/support/tickets`,
+  GET_ALL_TICKETS: `${API_BASE_URL}/admin/support/tickets`,
+  UPDATE_TICKET_STATUS: `${API_BASE_URL}/admin/support/tickets/{id}/status`,
+  REPLY_TO_TICKET: `${API_BASE_URL}/admin/support/tickets/{id}/reply`,
 };
 
 // Notification System Endpoints
