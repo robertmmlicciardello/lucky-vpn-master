@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -87,28 +88,28 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Modern Navigation Tabs - Improved Responsive Layout */}
+        {/* Modern Navigation Tabs - Single Row Mobile */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
           <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-2 shadow-xl border border-white/20">
-            {/* Mobile Navigation - Horizontal Scrollable */}
+            {/* Mobile Navigation - Single Row Horizontal Scroll */}
             <div className="block lg:hidden">
-              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+              <div className="flex gap-1 overflow-x-auto pb-2 scrollbar-hide">
                 {navigationItems.map((item) => {
                   const IconComponent = item.icon;
                   return (
                     <button
                       key={item.value}
                       onClick={() => setActiveTab(item.value)}
-                      className={`flex flex-col items-center gap-2 p-3 min-w-[80px] rounded-xl transition-all duration-200 whitespace-nowrap ${
+                      className={`flex flex-col items-center gap-1 p-2 min-w-[60px] rounded-lg transition-all duration-200 whitespace-nowrap ${
                         activeTab === item.value 
-                          ? 'bg-white shadow-lg scale-105 border-2 border-blue-200' 
+                          ? 'bg-white shadow-md scale-105 border border-blue-200' 
                           : 'hover:bg-white/50'
                       }`}
                     >
-                      <div className={`w-8 h-8 ${item.bgColor} rounded-lg flex items-center justify-center shadow-sm`}>
-                        <IconComponent className={`w-4 h-4 ${item.color}`} />
+                      <div className={`w-6 h-6 ${item.bgColor} rounded-md flex items-center justify-center`}>
+                        <IconComponent className={`w-3 h-3 ${item.color}`} />
                       </div>
-                      <span className="text-xs font-medium">
+                      <span className="text-[10px] font-medium text-center leading-tight">
                         {item.label}
                       </span>
                     </button>
