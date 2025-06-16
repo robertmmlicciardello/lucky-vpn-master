@@ -1,0 +1,23 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- This file contains placeholder references for icons -->
+    <!-- In a real app, you would have actual drawable images -->
+    
+    <!-- Navigation Icons -->
+    <!-- ic_home, ic_server, ic_gift, ic_person -->
+    
+    <!-- VPN Icons -->
+    <!-- ic_vpn_logo, ic_shield_check, ic_shield_off -->
+    
+    <!-- Action Icons -->
+    <!-- ic_crown, ic_support, ic_logout, ic_person_large -->
+    
+    <!-- Reward Icons -->
+    <!-- ic_calendar, ic_play, ic_wheel, ic_share, ic_star, ic_person_add -->
+    
+    <!-- Server Icons -->
+    <!-- ic_flag_default, ic_signal_strong, ic_signal_medium, ic_signal_weak -->
+    
+    <!-- Note: These should be replaced with actual vector drawables or PNG images -->
+</resources>
