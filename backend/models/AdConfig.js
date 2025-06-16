@@ -6,7 +6,6 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       autoIncrement: true
     },
-    // AdMob Configuration
     admob_app_id: {
       type: DataTypes.STRING,
       allowNull: true
@@ -23,7 +22,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true
     },
-    // Facebook Audience Network
     facebook_app_id: {
       type: DataTypes.STRING,
       allowNull: true
@@ -40,7 +38,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true
     },
-    // Unity Ads
     unity_game_id: {
       type: DataTypes.STRING,
       allowNull: true
@@ -57,7 +54,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: true
     },
-    // General Settings
     primary_network: {
       type: DataTypes.ENUM('admob', 'facebook', 'unity'),
       defaultValue: 'admob'

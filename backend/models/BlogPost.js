@@ -23,20 +23,12 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true
     },
     status: {
-      type: DataTypes.ENUM('draft', 'published', 'archived'),
+      type: DataTypes.ENUM('draft', 'published'),
       defaultValue: 'draft'
     },
     author_id: {
       type: DataTypes.INTEGER,
       allowNull: false
-    },
-    views: {
-      type: DataTypes.INTEGER,
-      defaultValue: 0
-    },
-    tags: {
-      type: DataTypes.JSON,
-      allowNull: true
     }
   });
 

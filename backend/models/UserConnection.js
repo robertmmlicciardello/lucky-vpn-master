@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     connected_at: {
       type: DataTypes.DATE,
+      allowNull: false,
       defaultValue: DataTypes.NOW
     },
     disconnected_at: {
@@ -24,19 +25,16 @@ module.exports = (sequelize, DataTypes) => {
     },
     duration: {
       type: DataTypes.INTEGER,
-      allowNull: true
+      defaultValue: 0,
+      comment: 'Duration in seconds'
     },
-    data_used: {
+    bytes_sent: {
       type: DataTypes.BIGINT,
       defaultValue: 0
     },
-    ip_address: {
-      type: DataTypes.STRING,
-      allowNull: true
-    },
-    device_info: {
-      type: DataTypes.JSON,
-      allowNull: true
+    bytes_received: {
+      type: DataTypes.BIGINT,
+      defaultValue: 0
     }
   });
 

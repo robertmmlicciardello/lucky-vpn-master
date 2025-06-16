@@ -13,18 +13,18 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class PaymentManager {
-    private static final String API_BASE_URL = "https://your-api-domain.com/api/v1";
+    private static final String API_BASE_URL = "http://your-backend-url.com/api/v1";
     private Context context;
 
     public PaymentManager(Context context) {
         this.context = context;
     }
 
-    public void initiatePayment(String planId, String paymentMethod) {
+    public void initiatePayment(String planId, String paymentMethod, double amount) {
         new Thread(() -> {
             try {
-                // Get payment account details
-                URL url = new URL(API_BASE_URL + "/payments/accounts");
+                // Get payment account details from backend
+                URL url = new URL(API_BASE_URL + "/subscription/accounts");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestProperty("Authorization", "Bearer " + getAccessToken());
 
@@ -46,7 +46,7 @@ public class PaymentManager {
                         String accountName = account.getString("account_name");
                         
                         // Show payment details to user
-                        showPaymentDialog(paymentMethod, accountNumber, accountName, planId);
+                        showPaymentDialog(paymentMethod, accountNumber, accountName, planId, amount);
                     }
                 }
 
@@ -56,21 +56,20 @@ public class PaymentManager {
         }).start();
     }
 
-    private void showPaymentDialog(String method, String accountNumber, String accountName, String planId) {
-        // This would show a dialog with payment instructions
-        // User would then make payment and enter transaction ID
+    private void showPaymentDialog(String method, String accountNumber, String accountName, String planId, double amount) {
         Intent intent = new Intent(context, PaymentActivity.class);
         intent.putExtra("payment_method", method);
         intent.putExtra("account_number", accountNumber);
         intent.putExtra("account_name", accountName);
         intent.putExtra("plan_id", planId);
+        intent.putExtra("amount", amount);
         context.startActivity(intent);
     }
 
-    public void submitPaymentProof(String planId, String paymentMethod, String transactionId) {
+    public void submitPaymentProof(String planId, String paymentMethod, String transactionId, double amount) {
         new Thread(() -> {
             try {
-                URL url = new URL(API_BASE_URL + "/payments/submit-proof");
+                URL url = new URL(API_BASE_URL + "/subscription/submit");
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json");
@@ -78,9 +77,11 @@ public class PaymentManager {
                 conn.setDoOutput(true);
 
                 JSONObject json = new JSONObject();
-                json.put("plan_id", planId);
-                json.put("payment_method", paymentMethod);
                 json.put("transaction_id", transactionId);
+                json.put("amount", amount);
+                json.put("payment_method", paymentMethod);
+                json.put("plan_type", planId);
+                json.put("duration", getDurationByPlan(planId));
 
                 OutputStream os = conn.getOutputStream();
                 os.write(json.toString().getBytes());
@@ -88,15 +89,23 @@ public class PaymentManager {
                 os.close();
 
                 int responseCode = conn.getResponseCode();
-                if (responseCode == 200) {
+                if (responseCode == 201) {
                     Log.d("PaymentManager", "Payment proof submitted successfully");
-                    // Notify user that payment is under review
                 }
 
             } catch (Exception e) {
                 Log.e("PaymentManager", "Error submitting payment proof", e);
             }
         }).start();
+    }
+
+    private int getDurationByPlan(String planId) {
+        switch (planId) {
+            case "monthly": return 30;
+            case "quarterly": return 90;
+            case "yearly": return 365;
+            default: return 30;
+        }
     }
 
     private String getAccessToken() {

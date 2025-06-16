@@ -19,16 +19,12 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     category: {
-      type: DataTypes.ENUM('general', 'technical', 'billing', 'feature_request'),
+      type: DataTypes.ENUM('general', 'technical', 'billing', 'feature'),
       defaultValue: 'general'
     },
     status: {
       type: DataTypes.ENUM('open', 'in_progress', 'resolved', 'closed'),
       defaultValue: 'open'
-    },
-    priority: {
-      type: DataTypes.ENUM('low', 'medium', 'high', 'urgent'),
-      defaultValue: 'medium'
     },
     admin_response: {
       type: DataTypes.TEXT,

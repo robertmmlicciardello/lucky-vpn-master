@@ -3,11 +3,11 @@ const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
 const sequelize = new Sequelize(
-  process.env.DB_NAME,
-  process.env.DB_USER,
-  process.env.DB_PASSWORD,
+  process.env.DB_NAME || 'lucky_vpn_master',
+  process.env.DB_USER || 'root',
+  process.env.DB_PASSWORD || '',
   {
-    host: process.env.DB_HOST,
+    host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 3306,
     dialect: 'mysql',
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
@@ -20,37 +20,59 @@ const sequelize = new Sequelize(
   }
 );
 
-const db = {};
-db.Sequelize = Sequelize;
-db.sequelize = sequelize;
-
-// Import models
-db.User = require('./User')(sequelize, Sequelize);
-db.Server = require('./Server')(sequelize, Sequelize);
-db.Payment = require('./Payment')(sequelize, Sequelize);
-db.Reward = require('./Reward')(sequelize, Sequelize);
-db.Admin = require('./Admin')(sequelize, Sequelize);
-db.OneConnectConfig = require('./OneConnectConfig')(sequelize, Sequelize);
-db.AdConfig = require('./AdConfig')(sequelize, Sequelize);
-db.Notification = require('./Notification')(sequelize, Sequelize);
-db.SupportTicket = require('./SupportTicket')(sequelize, Sequelize);
-db.BlogPost = require('./BlogPost')(sequelize, Sequelize);
-db.UserConnection = require('./UserConnection')(sequelize, Sequelize);
+// Import all models
+const User = require('./User')(sequelize, Sequelize.DataTypes);
+const Admin = require('./Admin')(sequelize, Sequelize.DataTypes);
+const Server = require('./Server')(sequelize, Sequelize.DataTypes);
+const Payment = require('./Payment')(sequelize, Sequelize.DataTypes);
+const Reward = require('./Reward')(sequelize, Sequelize.DataTypes);
+const Notification = require('./Notification')(sequelize, Sequelize.DataTypes);
+const SupportTicket = require('./SupportTicket')(sequelize, Sequelize.DataTypes);
+const BlogPost = require('./BlogPost')(sequelize, Sequelize.DataTypes);
+const AdConfig = require('./AdConfig')(sequelize, Sequelize.DataTypes);
+const OneConnectConfig = require('./OneConnectConfig')(sequelize, Sequelize.DataTypes);
+const UserConnection = require('./UserConnection')(sequelize, Sequelize.DataTypes);
 
 // Define associations
-db.User.hasMany(db.Payment);
-db.Payment.belongsTo(db.User);
+User.hasMany(Payment, { foreignKey: 'user_id' });
+Payment.belongsTo(User, { foreignKey: 'user_id' });
 
-db.User.hasMany(db.Reward);
-db.Reward.belongsTo(db.User);
+User.hasMany(Reward, { foreignKey: 'user_id' });
+Reward.belongsTo(User, { foreignKey: 'user_id' });
 
-db.User.hasMany(db.SupportTicket);
-db.SupportTicket.belongsTo(db.User);
+User.hasMany(Notification, { foreignKey: 'user_id' });
+Notification.belongsTo(User, { foreignKey: 'user_id' });
 
-db.User.hasMany(db.UserConnection);
-db.UserConnection.belongsTo(db.User);
+User.hasMany(SupportTicket, { foreignKey: 'user_id' });
+SupportTicket.belongsTo(User, { foreignKey: 'user_id' });
 
-db.Server.hasMany(db.UserConnection);
-db.UserConnection.belongsTo(db.Server);
+User.hasMany(UserConnection, { foreignKey: 'user_id' });
+UserConnection.belongsTo(User, { foreignKey: 'user_id' });
+
+Server.hasMany(UserConnection, { foreignKey: 'server_id' });
+UserConnection.belongsTo(Server, { foreignKey: 'server_id' });
+
+Admin.hasMany(BlogPost, { foreignKey: 'author_id' });
+BlogPost.belongsTo(Admin, { foreignKey: 'author_id' });
+
+// Self-referencing for user referrals
+User.hasMany(User, { as: 'referrals', foreignKey: 'referred_by' });
+User.belongsTo(User, { as: 'referrer', foreignKey: 'referred_by' });
+
+const db = {
+  sequelize,
+  Sequelize,
+  User,
+  Admin,
+  Server,
+  Payment,
+  Reward,
+  Notification,
+  SupportTicket,
+  BlogPost,
+  AdConfig,
+  OneConnectConfig,
+  UserConnection
+};
 
 module.exports = db;

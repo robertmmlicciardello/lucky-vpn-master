@@ -42,9 +42,9 @@ class APIClient {
     return response.json();
   }
 
-  // Auth
+  // Auth - Fixed admin login route
   async login(email: string, password: string) {
-    const response = await this.request('/auth/admin-login', {
+    const response = await this.request('/auth/admin/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
@@ -111,20 +111,20 @@ class APIClient {
     });
   }
 
-  // Payments
+  // Payments - Fixed route to match backend
   async getPendingPayments() {
-    return this.request('/payments/pending');
+    return this.request('/subscription/pending');
   }
 
   async approvePayment(paymentId: number, adminNotes?: string) {
-    return this.request(`/payments/${paymentId}/approve`, {
+    return this.request(`/subscription/${paymentId}/approve`, {
       method: 'POST',
       body: JSON.stringify({ admin_notes: adminNotes }),
     });
   }
 
   async rejectPayment(paymentId: number, adminNotes?: string) {
-    return this.request(`/payments/${paymentId}/reject`, {
+    return this.request(`/subscription/${paymentId}/reject`, {
       method: 'POST',
       body: JSON.stringify({ admin_notes: adminNotes }),
     });
