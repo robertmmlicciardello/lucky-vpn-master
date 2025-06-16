@@ -1,3 +1,4 @@
+
 package app.lovable.luckyvpnmaster;
 
 import android.app.Notification;
@@ -8,92 +9,146 @@ import android.content.Intent;
 import android.net.VpnService;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
+import android.util.Log;
 import androidx.core.app.NotificationCompat;
-import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 
 public class VPNService extends VpnService {
-    private static final String CHANNEL_ID = "VPN_SERVICE_CHANNEL";
+    private static final String TAG = "VPNService";
+    private static final String CHANNEL_ID = "VPN_CHANNEL";
     private static final int NOTIFICATION_ID = 1;
+    
     private ParcelFileDescriptor vpnInterface;
     private Thread vpnThread;
     private boolean isConnected = false;
+    private String serverIP;
+    private int serverPort;
+    private PointsManager pointsManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
         createNotificationChannel();
+        pointsManager = new PointsManager(this);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String action = intent.getAction();
-        
-        if ("CONNECT_VPN".equals(action)) {
-            String serverIP = intent.getStringExtra("SERVER_IP");
-            String serverPort = intent.getStringExtra("SERVER_PORT");
-            connectVPN(serverIP, serverPort);
-        } else if ("DISCONNECT_VPN".equals(action)) {
-            disconnectVPN();
+        if (intent != null) {
+            String action = intent.getStringExtra("action");
+            if ("connect".equals(action)) {
+                serverIP = intent.getStringExtra("server_ip");
+                serverPort = intent.getIntExtra("server_port", 1194);
+                startVPN();
+            } else if ("disconnect".equals(action)) {
+                stopVPN();
+            }
         }
-        
         return START_STICKY;
     }
 
-    private void connectVPN(String serverIP, String serverPort) {
+    private void startVPN() {
         if (isConnected) return;
-        
-        Builder builder = new Builder();
-        builder.setMtu(1500);
-        builder.addAddress("10.0.0.2", 32);
-        builder.addRoute("0.0.0.0", 0);
-        builder.addDnsServer("8.8.8.8");
-        builder.addDnsServer("8.8.4.4");
-        builder.setSession("VPN Master");
-        
+
         try {
+            // Create VPN interface
+            Builder builder = new Builder();
+            builder.setMtu(1400);
+            builder.addAddress("10.0.0.2", 24);
+            builder.addDnsServer("8.8.8.8");
+            builder.addDnsServer("8.8.4.4");
+            builder.addRoute("0.0.0.0", 0);
+            builder.setSession("Lucky VPN");
+
             vpnInterface = builder.establish();
+            
+            if (vpnInterface == null) {
+                Log.e(TAG, "Failed to establish VPN interface");
+                return;
+            }
+
             isConnected = true;
             
-            // Start foreground service
-            startForeground(NOTIFICATION_ID, createNotification("Connected to VPN"));
-            
             // Start VPN thread
-            vpnThread = new Thread(new VPNRunnable(vpnInterface, serverIP, serverPort));
+            vpnThread = new Thread(this::runVPN);
             vpnThread.start();
+
+            // Show notification
+            showNotification("Connected", "VPN is active");
             
-            // Notify web app about connection status
-            sendBroadcast(new Intent("VPN_STATUS_CHANGED").putExtra("connected", true));
+            // Add connection points
+            pointsManager.addPoints(10, "VPN Connection");
             
+            Log.d(TAG, "VPN started successfully");
+
         } catch (Exception e) {
-            e.printStackTrace();
-            disconnectVPN();
+            Log.e(TAG, "Error starting VPN", e);
+            stopVPN();
         }
     }
 
-    private void disconnectVPN() {
-        if (!isConnected) return;
-        
+    private void runVPN() {
         try {
-            if (vpnThread != null) {
-                vpnThread.interrupt();
+            FileInputStream in = new FileInputStream(vpnInterface.getFileDescriptor());
+            FileOutputStream out = new FileOutputStream(vpnInterface.getFileDescriptor());
+            
+            DatagramChannel tunnel = DatagramChannel.open();
+            tunnel.connect(new InetSocketAddress(serverIP, serverPort));
+            
+            ByteBuffer packet = ByteBuffer.allocate(32767);
+            
+            while (isConnected && !Thread.interrupted()) {
+                // Read from VPN interface
+                int length = in.available();
+                if (length > 0) {
+                    packet.clear();
+                    length = in.read(packet.array(), 0, Math.min(length, packet.capacity()));
+                    if (length > 0) {
+                        packet.limit(length);
+                        tunnel.write(packet);
+                    }
+                }
+
+                // Read from tunnel
+                packet.clear();
+                int receivedLength = tunnel.read(packet);
+                if (receivedLength > 0) {
+                    out.write(packet.array(), 0, receivedLength);
+                }
+
+                Thread.sleep(10);
             }
-            
-            if (vpnInterface != null) {
-                vpnInterface.close();
-                vpnInterface = null;
-            }
-            
-            isConnected = false;
-            stopForeground(true);
-            
-            // Notify web app about disconnection
-            sendBroadcast(new Intent("VPN_STATUS_CHANGED").putExtra("connected", false));
-            
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        } catch (Exception e) {
+            Log.e(TAG, "VPN thread error", e);
         }
+    }
+
+    private void stopVPN() {
+        isConnected = false;
+        
+        if (vpnThread != null) {
+            vpnThread.interrupt();
+            vpnThread = null;
+        }
+        
+        if (vpnInterface != null) {
+            try {
+                vpnInterface.close();
+            } catch (Exception e) {
+                Log.e(TAG, "Error closing VPN interface", e);
+            }
+            vpnInterface = null;
+        }
+        
+        stopForeground(true);
+        stopSelf();
+        
+        Log.d(TAG, "VPN stopped");
     }
 
     private void createNotificationChannel() {
@@ -110,57 +165,26 @@ public class VPNService extends VpnService {
         }
     }
 
-    private Notification createNotification(String text) {
-        Intent notificationIntent = new Intent(this, MainActivity.class);
+    private void showNotification(String title, String content) {
+        Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(
-            this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE
+            this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        return new NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("VPN Master")
-            .setContentText(text)
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle(title)
+            .setContentText(content)
             .setSmallIcon(R.drawable.ic_vpn)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .build();
-    }
 
-    private class VPNRunnable implements Runnable {
-        private ParcelFileDescriptor vpnInterface;
-        private String serverIP;
-        private String serverPort;
-
-        public VPNRunnable(ParcelFileDescriptor vpnInterface, String serverIP, String serverPort) {
-            this.vpnInterface = vpnInterface;
-            this.serverIP = serverIP;
-            this.serverPort = serverPort;
-        }
-
-        @Override
-        public void run() {
-            try {
-                // VPN packet handling logic would go here
-                // This is a simplified version - real implementation would need
-                // proper packet routing and encryption
-                
-                DatagramChannel tunnel = DatagramChannel.open();
-                tunnel.connect(new InetSocketAddress(serverIP, Integer.parseInt(serverPort)));
-                
-                // Keep connection alive
-                while (!Thread.interrupted() && isConnected) {
-                    // Handle VPN packets
-                    Thread.sleep(1000);
-                }
-                
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        startForeground(NOTIFICATION_ID, notification);
     }
 
     @Override
     public void onDestroy() {
-        disconnectVPN();
+        stopVPN();
         super.onDestroy();
     }
 }
