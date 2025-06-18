@@ -9,11 +9,10 @@ public class Server {
     public String ip;
     public String port;
     public String protocol;
-    public String type; // free or premium
-    public String status; // online, offline, maintenance
+    public String type;
+    public String status;
     public int load;
     public int users;
     public String configFile;
     public String provider;
-    public String flagUrl;
 }

@@ -9,5 +9,5 @@ public class User {
     public int points;
     public String referralCode;
     public String subscriptionExpires;
-    public String status;
+    public String createdAt;
 }

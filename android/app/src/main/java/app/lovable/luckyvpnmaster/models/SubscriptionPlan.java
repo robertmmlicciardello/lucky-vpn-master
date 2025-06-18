@@ -8,5 +8,5 @@ public class SubscriptionPlan {
     public double price;
     public String currency;
     public String[] features;
-    public boolean active = true;
+    public boolean popular;
 }

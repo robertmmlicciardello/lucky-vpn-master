@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import app.lovable.luckyvpnmaster.api.APIConfig;
 import app.lovable.luckyvpnmaster.models.LoginResponse;
 import app.lovable.luckyvpnmaster.models.User;
 
@@ -21,7 +22,6 @@ public class AuthManager {
     private static final String KEY_USER_EMAIL = "user_email";
     private static final String KEY_USER_PLAN = "user_plan";
     private static final String KEY_USER_POINTS = "user_points";
-    private static final String API_BASE_URL = "http://your-backend-url.com/api/v1";
     
     private Context context;
     private SharedPreferences prefs;
@@ -39,7 +39,7 @@ public class AuthManager {
     public void login(String email, String password, AuthCallback callback) {
         new Thread(() -> {
             try {
-                URL url = new URL(API_BASE_URL + "/auth/login");
+                URL url = new URL(APIConfig.API_BASE_URL + APIConfig.LOGIN_ENDPOINT);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json");
@@ -55,7 +55,8 @@ public class AuthManager {
                 os.close();
 
                 int responseCode = conn.getResponseCode();
-                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                BufferedReader br = new BufferedReader(new InputStreamReader(
+                    responseCode >= 200 && responseCode < 300 ? conn.getInputStream() : conn.getErrorStream()));
                 StringBuilder response = new StringBuilder();
                 String line;
                 while ((line = br.readLine()) != null) {
@@ -69,7 +70,6 @@ public class AuthManager {
                     String token = responseJson.getString("token");
                     JSONObject userData = responseJson.getJSONObject("data");
                     
-                    // Save user data
                     saveUserData(token, userData);
                     
                     LoginResponse loginResponse = new LoginResponse();
@@ -85,7 +85,7 @@ public class AuthManager {
 
             } catch (Exception e) {
                 Log.e("AuthManager", "Login error", e);
-                callback.onError("Network error. Please try again.");
+                callback.onError("Network error. Please check your connection.");
             }
         }).start();
     }
@@ -93,7 +93,7 @@ public class AuthManager {
     public void register(String name, String email, String password, String referralCode, AuthCallback callback) {
         new Thread(() -> {
             try {
-                URL url = new URL(API_BASE_URL + "/auth/register");
+                URL url = new URL(APIConfig.API_BASE_URL + APIConfig.REGISTER_ENDPOINT);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json");
@@ -113,7 +113,8 @@ public class AuthManager {
                 os.close();
 
                 int responseCode = conn.getResponseCode();
-                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                BufferedReader br = new BufferedReader(new InputStreamReader(
+                    responseCode >= 200 && responseCode < 300 ? conn.getInputStream() : conn.getErrorStream()));
                 StringBuilder response = new StringBuilder();
                 String line;
                 while ((line = br.readLine()) != null) {
@@ -127,7 +128,6 @@ public class AuthManager {
                     String token = responseJson.getString("token");
                     JSONObject userData = responseJson.getJSONObject("data");
                     
-                    // Save user data
                     saveUserData(token, userData);
                     
                     LoginResponse loginResponse = new LoginResponse();
@@ -143,7 +143,7 @@ public class AuthManager {
 
             } catch (Exception e) {
                 Log.e("AuthManager", "Register error", e);
-                callback.onError("Network error. Please try again.");
+                callback.onError("Network error. Please check your connection.");
             }
         }).start();
     }

@@ -15,7 +15,6 @@ import app.lovable.luckyvpnmaster.auth.AuthManager;
 import app.lovable.luckyvpnmaster.models.Server;
 
 public class ServerManager {
-    private static final String API_BASE_URL = "http://your-backend-url.com/api/v1";
     private Context context;
     private AuthManager authManager;
 
@@ -35,21 +34,23 @@ public class ServerManager {
     }
 
     public void getFreeServers(ServersCallback callback) {
-        getServers("/servers/free", callback);
+        getServers(APIConfig.FREE_SERVERS_ENDPOINT, callback);
     }
 
     public void getPremiumServers(ServersCallback callback) {
-        getServers("/servers/premium", callback);
+        getServers(APIConfig.PREMIUM_SERVERS_ENDPOINT, callback);
     }
 
     public void getBestServer(ServerCallback callback) {
         new Thread(() -> {
             try {
-                URL url = new URL(API_BASE_URL + "/servers/free");
+                URL url = new URL(APIConfig.API_BASE_URL + APIConfig.FREE_SERVERS_ENDPOINT);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestProperty("Authorization", "Bearer " + authManager.getAccessToken());
 
-                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                int responseCode = conn.getResponseCode();
+                BufferedReader br = new BufferedReader(new InputStreamReader(
+                    responseCode >= 200 && responseCode < 300 ? conn.getInputStream() : conn.getErrorStream()));
                 StringBuilder response = new StringBuilder();
                 String line;
                 while ((line = br.readLine()) != null) {
@@ -58,10 +59,9 @@ public class ServerManager {
                 br.close();
 
                 JSONObject responseJson = new JSONObject(response.toString());
-                if (responseJson.getBoolean("success")) {
+                if (responseCode == 200 && responseJson.getBoolean("success")) {
                     JSONArray serversArray = responseJson.getJSONArray("data");
                     if (serversArray.length() > 0) {
-                        // Return the first server with lowest load
                         JSONObject serverJson = serversArray.getJSONObject(0);
                         Server server = parseServer(serverJson);
                         callback.onSuccess(server);
@@ -82,11 +82,13 @@ public class ServerManager {
     private void getServers(String endpoint, ServersCallback callback) {
         new Thread(() -> {
             try {
-                URL url = new URL(API_BASE_URL + endpoint);
+                URL url = new URL(APIConfig.API_BASE_URL + endpoint);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestProperty("Authorization", "Bearer " + authManager.getAccessToken());
 
-                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                int responseCode = conn.getResponseCode();
+                BufferedReader br = new BufferedReader(new InputStreamReader(
+                    responseCode >= 200 && responseCode < 300 ? conn.getInputStream() : conn.getErrorStream()));
                 StringBuilder response = new StringBuilder();
                 String line;
                 while ((line = br.readLine()) != null) {
@@ -95,7 +97,7 @@ public class ServerManager {
                 br.close();
 
                 JSONObject responseJson = new JSONObject(response.toString());
-                if (responseJson.getBoolean("success")) {
+                if (responseCode == 200 && responseJson.getBoolean("success")) {
                     JSONArray serversArray = responseJson.getJSONArray("data");
                     List<Server> servers = new ArrayList<>();
                     
