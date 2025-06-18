@@ -42,36 +42,7 @@ const resources = {
       "admin.loginButton": "Login",
       "admin.loginSuccess": "Login Successful",
       "admin.loginFailed": "Login Failed",
-      "admin.invalidCredentials": "Invalid username or password",
-      
-      // VPN
-      "vpn.connected": "CONNECTED",
-      "vpn.disconnected": "DISCONNECTED",
-      "vpn.connecting": "CONNECTING",
-      "vpn.connect": "CONNECT",
-      "vpn.disconnect": "DISCONNECT",
-      "vpn.freeServers": "Free Servers",
-      "vpn.premiumServers": "Premium Servers",
-      
-      // User Management
-      "users.title": "User Management",
-      "users.totalUsers": "Total Users",
-      "users.activeUsers": "Active Users",
-      "users.premiumUsers": "Premium Users",
-      
-      // Servers
-      "servers.title": "Server Management",
-      "servers.totalServers": "Total Servers",
-      "servers.onlineServers": "Online Servers",
-      "servers.serverLoad": "Load: {{load}}%",
-      "servers.serverPing": "Ping: {{ping}}",
-      
-      // Rewards
-      "rewards.title": "Rewards System",
-      "rewards.dailyCheckin": "Daily Check-in",
-      "rewards.watchAd": "Watch Video",
-      "rewards.luckyWheel": "Lucky Wheel",
-      "rewards.points": "{{points}} Points"
+      "admin.invalidCredentials": "Invalid username or password"
     }
   },
   my: {
@@ -84,7 +55,7 @@ const resources = {
       "nav.plans": "အစီအစဉ်များ",
       "nav.rewards": "ဆုများ",
       "nav.notifications": "အကြောင်းကြားချက်များ",
-      "nav.support": "အကူအညီ",
+      "nav.support": "အကူအညী",
       "nav.blog": "ဘလော့",
       "nav.leaderboard": "ထိပ်တန်းစာရင်း",
       "nav.payments": "ငွေပေးချေမှုများ",
@@ -111,36 +82,7 @@ const resources = {
       "admin.loginButton": "ဝင်ရောက်ရန်",
       "admin.loginSuccess": "အောင်မြင်စွာ ဝင်ရောက်ပြီး",
       "admin.loginFailed": "ဝင်ရောက်မှု မအောင်မြင်ပါ",
-      "admin.invalidCredentials": "အမည် သို့မဟုတ် စကားဝှက် မမှန်ကန်ပါ",
-      
-      // VPN
-      "vpn.connected": "ချိတ်ဆက်ပြီး",
-      "vpn.disconnected": "ချိတ်ဆက်မှုပြတ်",
-      "vpn.connecting": "ချိတ်ဆက်နေ",
-      "vpn.connect": "ချိတ်ဆက်ရန်",
-      "vpn.disconnect": "ချိတ်ဆက်မှုဖြုတ်ရန်",
-      "vpn.freeServers": "အခမဲ့ဆာဗာများ",
-      "vpn.premiumServers": "ပရီမီယံဆာဗာများ",
-      
-      // User Management
-      "users.title": "အသုံးပြုသူ စီမံခန့်ခွဲမှု",
-      "users.totalUsers": "စုစုပေါင်း အသုံးပြုသူများ",
-      "users.activeUsers": "လှုပ်ရှားနေသော အသုံးပြုသူများ",
-      "users.premiumUsers": "ပရီမီယံ အသုံးပြုသူများ",
-      
-      // Servers
-      "servers.title": "ဆာဗာ စီမံခန့်ခွဲမှု",
-      "servers.totalServers": "စုစုပေါင်း ဆာဗာများ",
-      "servers.onlineServers": "အွန်လိုင်း ဆာဗာများ",
-      "servers.serverLoad": "ဝန်: {{load}}%",
-      "servers.serverPing": "ပင်: {{ping}}",
-      
-      // Rewards
-      "rewards.title": "ဆုလပ်စနစ်",
-      "rewards.dailyCheckin": "နေ့စဉ် စစ်ဆေးခြင်း",
-      "rewards.watchAd": "ဗီဒီယို ကြည့်ရန်",
-      "rewards.luckyWheel": "ကံကောင်း ဘီး",
-      "rewards.points": "{{points}} မှတ်"
+      "admin.invalidCredentials": "အမည် သို့မဟုတ် စကားဝှက် မမှန်ကန်ပါ"
     }
   },
   zh: {
@@ -210,7 +152,17 @@ const resources = {
       "common.search": "Buscar",
       "common.loading": "Cargando...",
       "common.error": "Error",
-      "common.success": "Éxito"
+      "common.success": "Éxito",
+      
+      // Admin Panel
+      "admin.title": "Panel de Administración",
+      "admin.welcome": "Bienvenido al Panel de Administración de Lucky VPN Master",
+      "admin.username": "Usuario",
+      "admin.password": "Contraseña",
+      "admin.loginButton": "Iniciar Sesión",
+      "admin.loginSuccess": "Inicio de Sesión Exitoso",
+      "admin.loginFailed": "Error al Iniciar Sesión",
+      "admin.invalidCredentials": "Usuario o contraseña inválidos"
     }
   },
   fr: {
@@ -240,7 +192,17 @@ const resources = {
       "common.search": "Rechercher",
       "common.loading": "Chargement...",
       "common.error": "Erreur",
-      "common.success": "Succès"
+      "common.success": "Succès",
+      
+      // Admin Panel
+      "admin.title": "Panneau d'Administration",
+      "admin.welcome": "Bienvenue dans le Panneau d'Administration Lucky VPN Master",
+      "admin.username": "Nom d'utilisateur",
+      "admin.password": "Mot de passe",
+      "admin.loginButton": "Se connecter",
+      "admin.loginSuccess": "Connexion réussie",
+      "admin.loginFailed": "Échec de la connexion",
+      "admin.invalidCredentials": "Nom d'utilisateur ou mot de passe invalide"
     }
   },
   ar: {
@@ -270,7 +232,17 @@ const resources = {
       "common.search": "بحث",
       "common.loading": "جاري التحميل...",
       "common.error": "خطأ",
-      "common.success": "نجح"
+      "common.success": "نجح",
+      
+      // Admin Panel
+      "admin.title": "لوحة الإدارة",
+      "admin.welcome": "مرحبا بك في لوحة إدارة Lucky VPN Master",
+      "admin.username": "اسم المستخدم",
+      "admin.password": "كلمة المرور",
+      "admin.loginButton": "تسجيل الدخول",
+      "admin.loginSuccess": "تم تسجيل الدخول بنجاح",
+      "admin.loginFailed": "فشل في تسجيل الدخول",
+      "admin.invalidCredentials": "اسم المستخدم أو كلمة المرور غير صحيحة"
     }
   },
   hi: {
@@ -300,7 +272,17 @@ const resources = {
       "common.search": "खोजें",
       "common.loading": "लोड हो रहा है...",
       "common.error": "त्रुटि",
-      "common.success": "सफलता"
+      "common.success": "सफलता",
+      
+      // Admin Panel
+      "admin.title": "एडमिन पैनल",
+      "admin.welcome": "Lucky VPN Master एडमिन पैनल में आपका स्वागत है",
+      "admin.username": "उपयोगकर्ता नाम",
+      "admin.password": "पासवर्ड",
+      "admin.loginButton": "लॉगिन",
+      "admin.loginSuccess": "लॉगिन सफल",
+      "admin.loginFailed": "लॉगिन असफल",
+      "admin.invalidCredentials": "अमान्य उपयोगकर्ता नाम या पासवर्ड"
     }
   }
 };
