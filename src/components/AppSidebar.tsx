@@ -1,17 +1,4 @@
-
-import { 
-  Users, 
-  Server, 
-  Settings, 
-  DollarSign, 
-  Smartphone, 
-  Gift,
-  BarChart3,
-  Shield,
-  MonitorPlay,
-  Sparkles,
-  CreditCard
-} from "lucide-react";
+import { useTranslation } from "react-i18next";
 import {
   Sidebar,
   SidebarContent,
@@ -21,65 +8,134 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarHeader,
 } from "@/components/ui/sidebar";
+import {
+  LayoutDashboard,
+  Server,
+  Users,
+  DollarSign,
+  Gift,
+  Bell,
+  HeadphonesIcon,
+  FileText,
+  Trophy,
+  CreditCard,
+  Settings,
+  Megaphone,
+} from "lucide-react";
 
 interface AppSidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
 }
 
-const navigationItems = [
-  { value: "dashboard", label: "Dashboard", icon: BarChart3, color: "text-blue-600" },
-  { value: "servers", label: "Servers", icon: Server, color: "text-green-600" },
-  { value: "users", label: "Users", icon: Users, color: "text-purple-600" },
-  { value: "ads", label: "Ads", icon: MonitorPlay, color: "text-orange-600" },
-  { value: "multi-ads", label: "Multi Ads", icon: Shield, color: "text-red-600" },
-  { value: "plans", label: "Plans", icon: DollarSign, color: "text-yellow-600" },
-  { value: "payments", label: "Payments", icon: CreditCard, color: "text-emerald-600" },
-  { value: "rewards", label: "Rewards", icon: Gift, color: "text-pink-600" },
-  { value: "notifications", label: "Notifications", icon: Smartphone, color: "text-indigo-600" },
-  { value: "support", label: "Support", icon: Settings, color: "text-cyan-600" },
-  { value: "blog", label: "Blog", icon: Settings, color: "text-teal-600" },
-  { value: "leaderboard", label: "Leaderboard", icon: Settings, color: "text-violet-600" },
-  { value: "settings", label: "Settings", icon: Settings, color: "text-gray-600" }
-];
+interface MenuItem {
+  title: string;
+  icon: any;
+  key: string;
+}
 
-export function AppSidebar({ activeTab, setActiveTab }: AppSidebarProps) {
+const AppSidebar = ({ activeTab, setActiveTab }: AppSidebarProps) => {
+  const { t } = useTranslation();
+
+  const menuItems = [
+    {
+      title: t("nav.dashboard"),
+      icon: LayoutDashboard,
+      key: "dashboard",
+    },
+    {
+      title: t("nav.servers"),
+      icon: Server,
+      key: "servers",
+    },
+    {
+      title: t("nav.users"),
+      icon: Users,
+      key: "users",
+    },
+    {
+      title: t("nav.ads"),
+      icon: Megaphone,
+      key: "ads",
+    },
+    {
+      title: "Multi Ad Networks",
+      icon: DollarSign,
+      key: "multi-ads",
+    },
+    {
+      title: t("nav.plans"),
+      icon: CreditCard,
+      key: "plans",
+    },
+    {
+      title: t("nav.rewards"),
+      icon: Gift,
+      key: "rewards",
+    },
+    {
+      title: t("nav.notifications"),
+      icon: Bell,
+      key: "notifications",
+    },
+    {
+      title: t("nav.support"),
+      icon: HeadphonesIcon,
+      key: "support",
+    },
+    {
+      title: t("nav.blog"),
+      icon: FileText,
+      key: "blog",
+    },
+    {
+      title: t("nav.leaderboard"),
+      icon: Trophy,
+      key: "leaderboard",
+    },
+    {
+      title: t("nav.payments"),
+      icon: DollarSign,
+      key: "payments",
+    },
+    {
+      title: t("nav.settings"),
+      icon: Settings,
+      key: "settings",
+    },
+  ];
+
   return (
     <Sidebar>
-      <SidebarHeader className="p-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-bold text-lg">VPN Admin</span>
-        </div>
-      </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="bg-gradient-to-b from-blue-600 to-purple-700">
         <SidebarGroup>
-          <SidebarGroupLabel>Management</SidebarGroupLabel>
+          <SidebarGroupLabel className="text-white/80 font-semibold text-lg mb-4">
+            Lucky VPN Master
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {navigationItems.map((item) => {
-                const IconComponent = item.icon;
-                return (
-                  <SidebarMenuItem key={item.value}>
-                    <SidebarMenuButton
-                      isActive={activeTab === item.value}
-                      onClick={() => setActiveTab(item.value)}
-                      className="flex items-center gap-3 p-3 rounded-lg transition-all"
-                    >
-                      <IconComponent className={`w-5 h-5 ${item.color}`} />
-                      <span>{item.label}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+            <SidebarMenu className="space-y-1">
+              {menuItems.map((item) => (
+                <SidebarMenuItem key={item.key}>
+                  <SidebarMenuButton
+                    onClick={() => setActiveTab(item.key)}
+                    className={`w-full justify-start gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                      activeTab === item.key
+                        ? "bg-white/20 text-white shadow-lg"
+                        : "text-white/70 hover:bg-white/10 hover:text-white"
+                    }`}
+                  >
+                    <item.icon className="w-5 h-5" />
+                    <span className="font-medium">{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   );
-}
+};
+
+export default AppSidebar;

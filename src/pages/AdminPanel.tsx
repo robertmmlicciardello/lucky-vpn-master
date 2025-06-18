@@ -21,6 +21,7 @@ import Leaderboard from "@/components/admin/Leaderboard";
 import PaymentManagement from "@/components/admin/PaymentManagement";
 
 const AdminPanel = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("dashboard");
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -35,7 +36,7 @@ const AdminPanel = () => {
   const handleLogout = () => {
     localStorage.removeItem("admin_logged_in");
     toast({
-      title: "Logged Out",
+      title: t("common.logout"),
       description: "You have been logged out successfully",
     });
     navigate("/admin-login");
@@ -86,18 +87,21 @@ const AdminPanel = () => {
                 <div className="flex items-center gap-4">
                   <SidebarTrigger />
                   <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    Admin Panel
+                    {t("admin.title")}
                   </h1>
                 </div>
-                <Button
-                  onClick={handleLogout}
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Logout
-                </Button>
+                <div className="flex items-center gap-2">
+                  <LanguageSwitcher />
+                  <Button
+                    onClick={handleLogout}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    {t("common.logout")}
+                  </Button>
+                </div>
               </div>
             </header>
 
