@@ -55,7 +55,7 @@ const resources = {
       "nav.plans": "အစီအစဉ်များ",
       "nav.rewards": "ဆုများ",
       "nav.notifications": "အကြောင်းကြားချက်များ",
-      "nav.support": "အကူအညী",
+      "nav.support": "အကူအညီ",
       "nav.blog": "ဘလော့",
       "nav.leaderboard": "ထိပ်တန်းစာရင်း",
       "nav.payments": "ငွေပေးချေမှုများ",
