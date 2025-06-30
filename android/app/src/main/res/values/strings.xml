@@ -1,62 +1,69 @@
 
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Lucky VPN Master</string>
+    <string name="app_name">Monetize VPN</string>
+    <string name="welcome">Welcome</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="connecting">Connecting...</string>
+    <string name="disconnecting">Disconnecting...</string>
+    <string name="select_server">Select Server</string>
+    <string name="tap_to_connect">Tap to connect</string>
+    <string name="loading_connection">Loading connection</string>
+    <string name="connection_status">Connection status</string>
+    
+    <!-- Offline State -->
+    <string name="no_internet">No Internet</string>
+    <string name="no_internet_connection">No Internet Connection</string>
+    <string name="offline_message">Please check your internet connection and try again. VPN requires an active internet connection to work properly.</string>
+    <string name="retry">Retry</string>
     
     <!-- Navigation -->
-    <string name="nav_home">Home</string>
-    <string name="nav_servers">Servers</string>
-    <string name="nav_rewards">Rewards</string>
-    <string name="nav_profile">Profile</string>
+    <string name="home">Home</string>
+    <string name="servers">Servers</string>
+    <string name="rewards">Rewards</string>
+    <string name="profile">Profile</string>
     
-    <!-- Auth -->
+    <!-- Server related -->
+    <string name="server_list">Server List</string>
+    <string name="ping">Ping</string>
+    <string name="premium_server">Premium Server</string>
+    <string name="free_server">Free Server</string>
+    
+    <!-- Profile -->
     <string name="login">Login</string>
     <string name="register">Register</string>
+    <string name="logout">Logout</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="name">Name</string>
     <string name="confirm_password">Confirm Password</string>
-    <string name="referral_code">Referral Code (Optional)</string>
-    <string name="forgot_password">Forgot Password?</string>
-    <string name="dont_have_account">Don\'t have an account?</string>
-    <string name="already_have_account">Already have an account?</string>
-    <string name="sign_up">Sign Up</string>
-    <string name="sign_in">Sign In</string>
+    <string name="upgrade_plan">Upgrade Plan</string>
     
-    <!-- VPN Connection -->
-    <string name="connected">CONNECTED</string>
-    <string name="disconnected">DISCONNECTED</string>
-    <string name="connecting">CONNECTING</string>
-    <string name="connect">CONNECT</string>
-    <string name="disconnect">DISCONNECT</string>
-    
-    <!-- Servers -->
-    <string name="free_servers">Free Servers</string>
-    <string name="premium_servers">Premium Servers</string>
-    <string name="server_load">Load: %1$d%%</string>
-    <string name="server_ping">Ping: %1$s</string>
+    <!-- Plans -->
+    <string name="free_plan">Free Plan</string>
+    <string name="premium_plan">Premium Plan</string>
+    <string name="monthly">Monthly</string>
+    <string name="yearly">Yearly</string>
     
     <!-- Rewards -->
     <string name="daily_checkin">Daily Check-in</string>
-    <string name="watch_ad">Watch Video</string>
-    <string name="lucky_wheel">Lucky Wheel</string>
-    <string name="points">%1$d Points</string>
-    
-    <!-- Profile -->
-    <string name="upgrade_to_premium">Upgrade to Premium</string>
-    <string name="support">Support</string>
-    <string name="logout">Logout</string>
-    <string name="current_plan">Current Plan: %1$s</string>
-    
-    <!-- Subscription -->
-    <string name="monthly_plan">Monthly Plan</string>
-    <string name="quarterly_plan">Quarterly Plan</string>
-    <string name="yearly_plan">Yearly Plan</string>
-    <string name="subscribe">Subscribe</string>
-    <string name="price_format">%1$.0f %2$s</string>
+    <string name="watch_ad">Watch Ad</string>
+    <string name="points">Points</string>
+    <string name="earn_points">Earn Points</string>
     
     <!-- Common -->
     <string name="loading">Loading...</string>
-    <string name="error_network">Network error. Please try again.</string>
-    <string name="error_general">Something went wrong. Please try again.</string>
+    <string name="error">Error</string>
+    <string name="success">Success</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    
+    <!-- VPN Status -->
+    <string name="vpn_connected">VPN Connected</string>
+    <string name="vpn_disconnected">VPN Disconnected</string>
+    <string name="secure_connection">Secure Connection</string>
 </resources>

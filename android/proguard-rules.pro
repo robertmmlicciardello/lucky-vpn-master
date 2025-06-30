@@ -1,28 +1,82 @@
 
-# Lucky VPN Master - ProGuard Rules for Code Obfuscation
+# Monetize VPN - Enhanced ProGuard Rules for Production
 
-# Keep application class
--keep public class app.lovable.luckyvpnmaster.** { *; }
+# Core obfuscation settings
+-dontskipnonpubliclibraryclasses
+-dontpreverify
+-verbose
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+-optimizationpasses 5
 
-# Keep VPN Service
--keep class app.lovable.luckyvpnmaster.VPNService { *; }
+# Keep application class and main components
+-keep public class app.lovable.monetizevpn.** { *; }
+-keep class app.lovable.monetizevpn.VPNService { *; }
+-keep class app.lovable.monetizevpn.models.** { *; }
+-keep interface app.lovable.monetizevpn.api.** { *; }
 
-# Keep model classes
--keep class app.lovable.luckyvpnmaster.models.** { *; }
-
-# Keep API interfaces
--keep interface app.lovable.luckyvpnmaster.api.** { *; }
-
-# Keep R class
--keep class **.R
--keep class **.R$* {
-    <fields>;
+# Protect VPN core logic from reverse engineering
+-keep class app.lovable.monetizevpn.vpn.** { *; }
+-keep class app.lovable.monetizevpn.security.** { *; }
+-keepclassmembers class app.lovable.monetizevpn.VPNService {
+    private void runVPN();
+    private void processPacket(...);
+    private void establishTunnel(...);
 }
 
 # Keep native methods
 -keepclasseswithmembernames class * {
     native <methods>;
 }
+
+# Protect ad integration
+-keep class app.lovable.monetizevpn.ads.** { *; }
+-keep class com.google.android.gms.ads.** { *; }
+-keep class com.google.ads.** { *; }
+-keep class com.facebook.ads.** { *; }
+-keep class com.unity3d.ads.** { *; }
+-keep class com.applovin.** { *; }
+-keep class com.startapp.** { *; }
+
+# Obfuscate payment and sensitive data classes
+-keepclassmembers class app.lovable.monetizevpn.models.Payment {
+    private java.lang.String transactionId;
+    private java.lang.String paymentMethod;
+}
+-keepclassmembers class app.lovable.monetizevpn.models.User {
+    private java.lang.String token;
+    private java.lang.String apiKey;
+}
+
+# Remove debug logs in release builds
+-assumenosideeffects class android.util.Log {
+    public static boolean isLoggable(java.lang.String, int);
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
+    public static int w(...);
+    public static int e(...);
+}
+
+# Remove debug classes and methods
+-assumenosideeffects class app.lovable.monetizevpn.utils.Debug {
+    public static void log(...);
+    public static void print(...);
+}
+
+# Encrypt string constants
+-adaptclassstrings
+-obfuscationdictionary dictionary.txt
+-classobfuscationdictionary dictionary.txt
+-packageobfuscationdictionary dictionary.txt
+
+# Advanced obfuscation
+-repackageclasses ''
+-allowaccessmodification
+-overloadaggressively
+
+# Keep R class
+-keep class **.R
+-keep class **.R$* { <fields>; }
 
 # Keep custom views
 -keep public class * extends android.view.View {
@@ -52,31 +106,7 @@
     public static ** valueOf(java.lang.String);
 }
 
-# Google Play Services
--keep class com.google.android.gms.** { *; }
--dontwarn com.google.android.gms.**
-
-# AdMob
--keep class com.google.android.gms.ads.** { *; }
--keep class com.google.ads.** { *; }
-
-# Facebook Ads
--keep class com.facebook.ads.** { *; }
--dontwarn com.facebook.ads.**
-
-# Unity Ads
--keep class com.unity3d.ads.** { *; }
--dontwarn com.unity3d.ads.**
-
-# AppLovin
--keep class com.applovin.** { *; }
--dontwarn com.applovin.**
-
-# StartApp
--keep class com.startapp.** { *; }
--dontwarn com.startapp.**
-
-# OkHttp
+# Network security
 -dontwarn okhttp3.**
 -dontwarn okio.**
 -dontwarn javax.annotation.**
@@ -96,21 +126,3 @@
 -keep class * implements com.google.gson.TypeAdapterFactory
 -keep class * implements com.google.gson.JsonSerializer
 -keep class * implements com.google.gson.JsonDeserializer
-
-# Remove debug logs in release builds
--assumenosideeffects class android.util.Log {
-    public static boolean isLoggable(java.lang.String, int);
-    public static int v(...);
-    public static int i(...);
-    public static int w(...);
-    public static int d(...);
-    public static int e(...);
-}
-
-# Optimize and obfuscate
--optimizationpasses 5
--dontusemixedcaseclassnames
--dontskipnonpubliclibraryclasses
--dontpreverify
--verbose
--optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
