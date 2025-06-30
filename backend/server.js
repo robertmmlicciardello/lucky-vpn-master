@@ -1,10 +1,12 @@
 
 const express = require('express');
 const cors = require('cors');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
+// Import security configurations
+const { authLimiter, generalLimiter, paymentLimiter, securityConfig } = require('./config/security');
+
+// Import routes
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const serverRoutes = require('./routes/servers');
@@ -24,23 +26,52 @@ const logger = require('./utils/logger');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Validate required environment variables
+const requiredEnvVars = ['JWT_SECRET', 'DB_HOST', 'DB_USER', 'DB_NAME'];
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    logger.error(`Missing required environment variable: ${envVar}`);
+    process.exit(1);
+  }
+}
+
 // Security middleware
-app.use(helmet());
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-  credentials: true
-}));
+app.use(securityConfig.helmet);
+app.use(cors(securityConfig.cors));
+
+// Trust proxy for accurate IP addresses
+app.set('trust proxy', 1);
 
 // Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
-});
-app.use(limiter);
+app.use('/api/v1/auth/login', authLimiter);
+app.use('/api/v1/auth/register', authLimiter);
+app.use('/api/v1/auth/admin/login', authLimiter);
+app.use('/api/v1/subscription/submit', paymentLimiter);
+app.use('/api/v1', generalLimiter);
 
-// Body parsing middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+// Body parsing middleware with size limits
+app.use(express.json({ 
+  limit: process.env.UPLOAD_MAX_SIZE || '10mb',
+  verify: (req, res, buf) => {
+    req.rawBody = buf;
+  }
+}));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Security headers middleware
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
+// Request logging middleware
+app.use((req, res, next) => {
+  logger.info(`${req.method} ${req.path} - ${req.ip}`);
+  next();
+});
 
 // Routes
 app.use('/api/v1/auth', authRoutes);
@@ -58,15 +89,11 @@ app.use('/api/v1/leaderboard', leaderboardRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  logger.error(err.stack);
-  res.status(500).json({
-    success: false,
-    message: 'Something went wrong!'
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    version: process.env.npm_package_version || '1.0.0',
+    environment: process.env.NODE_ENV || 'development'
   });
 });
 
@@ -78,13 +105,39 @@ app.use('*', (req, res) => {
   });
 });
 
+// Global error handling middleware
+app.use((err, req, res, next) => {
+  logger.error(err.stack);
+  
+  // Don't leak error details in production
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  res.status(err.status || 500).json({
+    success: false,
+    message: isDevelopment ? err.message : 'Internal server error',
+    ...(isDevelopment && { stack: err.stack })
+  });
+});
+
+// Graceful shutdown handling
+process.on('SIGTERM', () => {
+  logger.info('SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    logger.info('Process terminated');
+    process.exit(0);
+  });
+});
+
 // Database sync and server start
 db.sequelize.sync({ force: false }).then(() => {
-  app.listen(PORT, () => {
+  const server = app.listen(PORT, () => {
     logger.info(`Server is running on port ${PORT}`);
+    logger.info(`Environment: ${process.env.NODE_ENV}`);
+    logger.info(`Frontend URL: ${process.env.FRONTEND_URL}`);
   });
 }).catch(err => {
   logger.error('Unable to connect to the database:', err);
+  process.exit(1);
 });
 
 module.exports = app;
