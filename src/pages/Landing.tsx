@@ -64,9 +64,14 @@ const Landing = () => {
       <header className="bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-2">
-              <Shield className="w-8 h-8 text-blue-600" />
-              <span className="text-2xl font-bold text-gray-900">SecureVPN</span>
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <Shield className="w-10 h-10 text-blue-600" />
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                </div>
+              </div>
+              <span className="text-2xl font-bold text-gray-900">Monetize VPN</span>
             </div>
             <div className="flex items-center space-x-4">
               <Button variant="ghost" asChild>
@@ -85,11 +90,11 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-5xl lg:text-7xl font-bold text-gray-900 mb-6">
             Your Privacy,
-            <span className="text-blue-600"> Protected</span>
+            <span className="text-blue-600"> Monetized</span>
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Experience the fastest, most secure VPN service. Connect to any server worldwide 
-            and protect your digital life with military-grade encryption.
+            Experience the fastest, most secure VPN service with built-in monetization features. 
+            Connect to any server worldwide and protect your digital life with military-grade encryption.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-4">
@@ -108,7 +113,7 @@ const Landing = () => {
       <section className="py-20 px-4 bg-white/50">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-16">
-            Why Choose SecureVPN?
+            Why Choose Monetize VPN?
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
@@ -196,9 +201,14 @@ const Landing = () => {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12 px-4">
         <div className="max-w-7xl mx-auto text-center">
-          <div className="flex items-center justify-center space-x-2 mb-6">
-            <Shield className="w-8 h-8 text-blue-400" />
-            <span className="text-2xl font-bold">SecureVPN</span>
+          <div className="flex items-center justify-center space-x-3 mb-6">
+            <div className="relative">
+              <Shield className="w-8 h-8 text-blue-400" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full flex items-center justify-center">
+                <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+              </div>
+            </div>
+            <span className="text-2xl font-bold">Monetize VPN</span>
           </div>
           <p className="text-gray-400 mb-6">
             Protecting your privacy since 2020. Trusted by millions worldwide.

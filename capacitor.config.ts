@@ -2,8 +2,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.5841988347074e23b7b66a979709933a',
-  appName: 'lucky-vpn-master',
+  appId: 'app.monetizevpn.master',
+  appName: 'Monetize VPN',
   webDir: 'dist',
   server: {
     url: 'https://58419883-4707-4e23-b7b6-6a979709933a.lovableproject.com?forceHideBadge=true',

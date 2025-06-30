@@ -1,73 +1,91 @@
-# Welcome to your Lovable project
 
-## Project info
+# Monetize VPN
+
+A complete VPN solution with built-in monetization features, admin panel, and Android app.
+
+## Project Info
 
 **URL**: https://lovable.dev/projects/58419883-4707-4e23-b7b6-6a979709933a
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+### 🎛️ Admin Panel
+- Complete user management system
+- VPN server management 
+- Payment processing & approval
+- Multi-network ad management (AdMob, Facebook, Unity, etc.)
+- Rewards & points system
+- Push notifications
+- Blog & content management
+- Support ticket system
+- Analytics & reporting
+
+### 📱 Android App
+- One-tap VPN connection
+- Multiple server locations
+- User authentication & profiles
+- Subscription management
+- Rewards system with games
+- Multi-language support
+- In-app purchases
+- Ad integration with multiple networks
+
+## How to Edit
+
+There are several ways to edit your application:
 
 **Use Lovable**
-
 Simply visit the [Lovable Project](https://lovable.dev/projects/58419883-4707-4e23-b7b6-6a979709933a) and start prompting.
 
-Changes made via Lovable will be committed automatically to this repo.
-
 **Use your preferred IDE**
+If you want to work locally using your own IDE, you can clone this repo and push changes.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Requirements: Node.js & npm - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
+# Navigate to project directory
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
+# Install dependencies
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Technology Stack
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- **Frontend**: React 18 + TypeScript
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Backend**: Node.js + Express
+- **Database**: MySQL with Sequelize ORM
+- **Mobile**: Capacitor for Android
+- **Authentication**: JWT tokens
 
-**Use GitHub Codespaces**
+## Deployment
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Open [Lovable](https://lovable.dev/projects/58419883-4707-4e23-b7b6-6a979709933a) and click Share → Publish.
 
-## What technologies are used for this project?
+## Custom Domain
 
-This project is built with:
+Navigate to Project > Settings > Domains to connect your custom domain.
+Read more: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Security
 
-## How can I deploy this project?
+This project includes enterprise-level security features:
+- Environment variable protection
+- Rate limiting
+- Input validation
+- Encrypted data storage
+- Secure authentication
+- Anti-cheat protection
 
-Simply open [Lovable](https://lovable.dev/projects/58419883-4707-4e23-b7b6-6a979709933a) and click on Share -> Publish.
+For detailed security setup instructions, see `SECURITY_SETUP.md`.
 
-## Can I connect a custom domain to my Lovable project?
+## Commercial License
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+This project is designed for commercial use and can be sold on platforms like Codecanyon.
