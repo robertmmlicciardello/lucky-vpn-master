@@ -2,201 +2,262 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { User } = require('../models');
 const { body, validationResult } = require('express-validator');
-const { User, Admin } = require('../models');
+const { asyncHandler, AppError } = require('../middleware/errorHandler');
+const logger = require('../utils/logger');
 const router = express.Router();
 
-// User Registration
+/**
+ * @swagger
+ * /api/v1/auth/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: John Doe
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: john@example.com
+ *               password:
+ *                 type: string
+ *                 minLength: 6
+ *                 example: password123
+ *               phone:
+ *                 type: string
+ *                 example: +1234567890
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Success'
+ *       400:
+ *         description: Validation error or user already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
 router.post('/register', [
-  body('name').notEmpty().withMessage('Name is required'),
-  body('email').isEmail().withMessage('Valid email is required'),
+  body('name').trim().isLength({ min: 2 }).withMessage('Name must be at least 2 characters'),
+  body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
-], async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        errors: errors.array()
-      });
+], asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new AppError('Validation failed', 400);
+  }
+
+  const { name, email, password, phone } = req.body;
+
+  const existingUser = await User.findOne({ where: { email } });
+  if (existingUser) {
+    throw new AppError('User already exists with this email', 400);
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 12);
+  
+  const user = await User.create({
+    name,
+    email,
+    password: hashedPassword,
+    phone: phone || null,
+    plan: 'free',
+    points: 0,
+    status: 'active'
+  });
+
+  const token = jwt.sign(
+    { id: user.id, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+  );
+
+  logger.info('New user registered', { userId: user.id, email: user.email });
+
+  res.status(201).json({
+    success: true,
+    message: 'User registered successfully',
+    data: {
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        plan: user.plan,
+        points: user.points
+      },
+      token
     }
+  });
+}));
 
-    const { name, email, password, phone, referralCode } = req.body;
+/**
+ * @swagger
+ * /api/v1/auth/login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: john@example.com
+ *               password:
+ *                 type: string
+ *                 example: password123
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Success'
+ *       401:
+ *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.post('/login', [
+  body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
+  body('password').notEmpty().withMessage('Password is required')
+], asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new AppError('Validation failed', 400);
+  }
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: 'User already exists'
-      });
-    }
+  const { email, password } = req.body;
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+  const user = await User.findOne({ where: { email } });
+  if (!user) {
+    throw new AppError('Invalid email or password', 401);
+  }
 
-    // Generate referral code
-    const userReferralCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+  if (user.status === 'blocked') {
+    throw new AppError('Your account has been blocked. Please contact support.', 401);
+  }
 
-    // Create user
-    const userData = {
-      name,
-      email,
-      password: hashedPassword,
-      phone,
-      referral_code: userReferralCode
-    };
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    throw new AppError('Invalid email or password', 401);
+  }
 
-    // Handle referral
-    if (referralCode) {
-      const referrer = await User.findOne({ where: { referral_code: referralCode } });
-      if (referrer) {
-        userData.referred_by = referrer.id;
-        // Add bonus points to referrer
-        await referrer.increment('points', { by: 500 });
-      }
-    }
+  const token = jwt.sign(
+    { id: user.id, email: user.email },
+    process.env.JWT_SECRET,
+    { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+  );
 
-    const user = await User.create(userData);
+  logger.info('User logged in', { userId: user.id, email: user.email });
 
-    // Generate JWT token
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
-
-    res.status(201).json({
-      success: true,
-      message: 'User registered successfully',
-      data: {
+  res.json({
+    success: true,
+    message: 'Login successful',
+    data: {
+      user: {
         id: user.id,
         name: user.name,
         email: user.email,
         plan: user.plan,
         points: user.points,
-        referral_code: user.referral_code
+        status: user.status
       },
       token
-    });
+    }
+  });
+}));
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
-
-// User Login
-router.post('/login', [
-  body('email').isEmail().withMessage('Valid email is required'),
+/**
+ * @swagger
+ * /api/v1/auth/admin/login:
+ *   post:
+ *     summary: Admin login
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: admin@monetizevpn.com
+ *               password:
+ *                 type: string
+ *                 example: admin123
+ *     responses:
+ *       200:
+ *         description: Admin login successful
+ *       401:
+ *         description: Invalid admin credentials
+ */
+router.post('/admin/login', [
+  body('email').isEmail().normalizeEmail().withMessage('Please provide a valid email'),
   body('password').notEmpty().withMessage('Password is required')
-], async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        errors: errors.array()
-      });
-    }
+], asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new AppError('Validation failed', 400);
+  }
 
-    const { email, password } = req.body;
+  const { email, password } = req.body;
 
-    // Find user
-    const user = await User.findOne({ where: { email } });
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid credentials'
-      });
-    }
+  // For demo purposes - in production, use proper admin user system
+  if (email === 'admin@monetizevpn.com' && password === 'admin123') {
+    const token = jwt.sign(
+      { id: 1, email: email, role: 'admin' },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    );
 
-    // Check if user is blocked
-    if (user.status === 'blocked') {
-      return res.status(403).json({
-        success: false,
-        message: 'Account has been blocked'
-      });
-    }
-
-    // Verify password
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid credentials'
-      });
-    }
-
-    // Update last seen
-    await user.update({ last_seen: new Date() });
-
-    // Generate JWT token
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '30d' });
+    logger.info('Admin logged in', { email });
 
     res.json({
       success: true,
-      message: 'Login successful',
+      message: 'Admin login successful',
       data: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        plan: user.plan,
-        points: user.points,
-        subscription_expires: user.subscription_expires
-      },
-      token
-    });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
-    });
-  }
-});
-
-// Admin Login
-router.post('/admin/login', [
-  body('email').isEmail().withMessage('Valid email is required'),
-  body('password').notEmpty().withMessage('Password is required')
-], async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    // For demo purposes, using hardcoded admin credentials
-    // In production, store in database with proper hashing
-    if (email === 'admin@luckyvpn.com' && password === 'admin123') {
-      const token = jwt.sign({ 
-        id: 1, 
-        role: 'admin' 
-      }, process.env.JWT_SECRET, { expiresIn: '24h' });
-
-      res.json({
-        success: true,
-        message: 'Admin login successful',
-        data: {
+        admin: {
           id: 1,
-          email: 'admin@luckyvpn.com',
+          email: email,
           role: 'admin'
         },
         token
-      });
-    } else {
-      res.status(400).json({
-        success: false,
-        message: 'Invalid admin credentials'
-      });
-    }
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      success: false,
-      message: 'Server error'
+      }
     });
+  } else {
+    throw new AppError('Invalid admin credentials', 401);
   }
-});
+}));
 
 module.exports = router;
