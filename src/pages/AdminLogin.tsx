@@ -21,6 +21,7 @@ const AdminLogin = () => {
     // Simulate login (replace with actual API call)
     setTimeout(() => {
       if (email === "admin@monetizevpn.com" && password === "admin123") {
+        localStorage.setItem("admin_logged_in", "true");
         navigate("/admin");
       } else {
         alert("Invalid credentials");
