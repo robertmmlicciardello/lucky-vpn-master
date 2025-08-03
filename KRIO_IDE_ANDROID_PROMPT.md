@@ -34,6 +34,11 @@ The app must connect to a Node.js backend running at:
 - `GET /servers/premium` - Get premium servers
 - `GET /servers/{id}/config` - Get server configuration
 
+#### OneConnect Integration:
+- `GET /oneconnect/config` - Get OneConnect configuration
+- `PUT /oneconnect/config` - Update OneConnect settings
+- `POST /oneconnect/sync` - Sync servers from OneConnect API
+
 #### Rewards & Points System:
 - `POST /rewards/daily-checkin` - Daily check-in reward
 - `POST /rewards/watch-video` - Watch ad reward
@@ -110,6 +115,12 @@ public class ServerManager {
     
     // Test server speed/ping
     public void testServerSpeed(Server server, SpeedCallback callback)
+    
+    // OneConnect integration
+    public void syncOneConnectServers(OneConnectCallback callback)
+    
+    // Check OneConnect status
+    public boolean isOneConnectEnabled()
 }
 ```
 
@@ -287,6 +298,9 @@ public class Server {
     public int ping; // Ping in milliseconds
     public String config; // VPN configuration
     public boolean isActive;
+    public String provider; // "manual" or "oneconnect"
+    public String oneConnectId; // OneConnect server ID
+    public String lastSync; // Last sync time for OneConnect servers
 }
 ```
 
